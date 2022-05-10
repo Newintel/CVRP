@@ -54,12 +54,15 @@ const graphFactory = ({ attributes } : IGraphFactory) : Graph => {
     ctx.stroke();
   };
 
+  const clear = () => ctx?.clearRect(0, 0, canvas.width, canvas.height);
+
   return ({
     addPoint,
     addCircle,
     canvas,
     ctx,
     addPath,
+    clear,
   });
 };
 

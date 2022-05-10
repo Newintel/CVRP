@@ -28,9 +28,11 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.js'],
-    plugins: [new TsconfigPathsPlugin({
-      extensions: ['.ts', '.js'],
-    })],
+    plugins: [
+      new TsconfigPathsPlugin({
+        extensions: ['.ts', '.js'],
+      }),
+    ],
   },
   plugins: [
     new HTMLWebpackPlugin({

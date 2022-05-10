@@ -8,6 +8,7 @@ interface IGraph {
     addCircle : (center : IPoint, radius : number, fill ?: boolean) => void,
     addPoint : (p : IPoint) => void,
     addPath : (points : IPoint[], color ?: StrokeColor) => void,
+    clear : () => void
 }
 
 export default IGraph;
