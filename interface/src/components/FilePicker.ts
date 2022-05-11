@@ -3,6 +3,13 @@ interface IProps {
   onValidate : EventListener
 }
 
+
+/**
+ * Crée un composant contenant un input pour sélectionner
+ * un fichier et un bouton pour valider la sélection
+ * @param onChange action à effectuer lorsqu'un nouveau fichier est choisi
+ * @param onValidate action à effectuer lorsqu'on clique sur le bouton valider
+ */
 const FilePicker = ({ onChange, onValidate } : IProps) => {
   const parent = document.createElement('div');
   parent.className = 'd-flex justify-content-around';

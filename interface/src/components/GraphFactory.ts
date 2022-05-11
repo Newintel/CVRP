@@ -1,12 +1,21 @@
-import { Attributes, Graph, Point } from 'types';
+import {
+  Attributes, Graph, Point,
+} from 'types';
 import { Color } from 'types/draw';
 import { Utils } from 'utils';
 
 interface IGraphFactory {
-  attributes ?: Attributes
+  attributes ?: Attributes,
 }
 
-const pointToCoordinates = (p : Point) : [Point['x'], Point['y']] => [p.x, p.y];
+const pointToCoordinates = (p : Point) : [ Point[ 'x' ], Point[ 'y' ] ] => (
+  [p.x, p.y]
+);
+
+/**
+ * Change les coordonnées du point pour mieux correspondre au canvas
+ */
+const normalizePoint = (p : Point) : Point => ({ x: 5 * p.x, y: 5 * p.y });
 
 /**
  * Crée un canvas
@@ -14,28 +23,39 @@ const pointToCoordinates = (p : Point) : [Point['x'], Point['y']] => [p.x, p.y];
  */
 const graphFactory = ({ attributes } : IGraphFactory) : Graph => {
   const canvas = document.createElement('canvas');
+
   if (attributes !== undefined) {
     Utils.addAttributes(canvas, attributes);
   }
 
   const ctx = canvas.getContext('2d');
 
-  const addCircle = (center : Point, radius : number, fill ?: boolean) => {
-    if (ctx === null) {
-      return;
-    }
+  const addCircle : Graph['addCircle'] =
+    (
+      center : Point, radius : number, fill = false, color = Color.BLACK,
+    ) => {
+      if (ctx === null) {
+        return;
+      }
 
-    ctx.beginPath();
-    ctx.arc(center.x, center.y, radius, 0, 2*Math.PI);
+      const _center = normalizePoint(center);
 
-    if (fill) {
-      ctx.fill();
-    }
-  };
+      ctx.beginPath();
+      ctx.arc(
+        _center.x, _center.y, radius, 0, 2*Math.PI,
+      );
 
-  const addPoint : Graph['addPoint'] = point => {
-    addCircle(point, 3, true);
-  };
+      if (fill) {
+        ctx.fillStyle = color;
+        ctx.fill();
+      }
+    };
+
+  const addPoint : Graph['addPoint'] = (point, color = Color.BLACK) => 
+    addCircle(
+      point, 3, true, color
+    );
+
 
   const addPath : Graph['addPath'] = (points, color = Color.BLACK) => {
     const len = points.length;
@@ -46,15 +66,17 @@ const graphFactory = ({ attributes } : IGraphFactory) : Graph => {
     }
 
     while ( i < len) {
-      ctx.moveTo(...pointToCoordinates(points[i++]));
-      ctx.lineTo(...pointToCoordinates(points[i % len]));
+      ctx.moveTo(...pointToCoordinates(normalizePoint(points[i++])));
+      ctx.lineTo(...pointToCoordinates(normalizePoint(points[i % len])));
     }
 
     ctx.strokeStyle = color;
     ctx.stroke();
   };
 
-  const clear = () => ctx?.clearRect(0, 0, canvas.width, canvas.height);
+  const clear = () => ctx?.clearRect(
+    0, 0, canvas.width, canvas.height,
+  );
 
   return ({
     addPoint,

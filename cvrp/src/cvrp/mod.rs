@@ -24,15 +24,15 @@ impl CVRP {
             .from_reader(csv.as_bytes());
 
         for entry in reader.deserialize::<Client>() {
-            let record = entry.expect("nope");
+            let record = entry.expect("Entry as Client failed");
             self.clients.push(record)
         }
     }
 
-    pub fn clients_to_points(&self) -> js_sys::Array {
+    pub fn get_clients(&self) -> js_sys::Array {
         let clients = js_sys::Array::new();
         for client in &self.clients {
-            clients.push(&client.to_point());
+            clients.push(&client.to_json());
         }
         clients
     }

@@ -15,13 +15,70 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "object-curly-spacing": ["error", "always", { "arraysInObjects": false }],
-        "arrow-parens" : ["error", "as-needed"],
-        "array-bracket-newline": ["error", { "multiline": true, "minItems": 3 }],
-        "array-element-newline": ["error", { "multiline": true, "minItems": 3 }],
+        "object-curly-spacing": [
+            "error",
+            "always",
+            {
+                "arraysInObjects": false
+            }
+        ],
+        "arrow-parens": [
+            "error",
+            "as-needed"
+        ],
+        "array-bracket-newline": [
+            "error",
+            {
+                "multiline": true,
+                "minItems": 3
+            }
+        ],
+        "array-element-newline": [
+            "error",
+            {
+                "multiline": true,
+                "minItems": 3
+            }
+        ],
         "no-unused-vars": "off",
-        "@typescript-eslint/no-unused-vars" : ["warn"],
-        "@typescript-eslint/type-annotation-spacing" : ["error", {"before" : true, "after" : true}],
-        "indent" : ["error", 2]
+        "@typescript-eslint/no-unused-vars": [
+            "warn"
+        ],
+        "@typescript-eslint/type-annotation-spacing": [
+            "error",
+            {
+                "before": true,
+                "after": true
+            }
+        ],
+        "@typescript-eslint/member-delimiter-style": [
+            "error",
+            {
+                "multiline": {
+                    "delimiter": "comma"
+                },
+                "singleline": {
+                    "delimiter": "comma"
+                }
+            }
+        ],
+        "object-curly-newline": [
+            "error",
+            {
+                "minProperties" : 3,
+                "consistent": true
+            }
+        ],
+        "function-paren-newline": [
+            "error",
+            {
+                "minItems": 3,
+                "consistent": true
+            }
+        ],
+        "indent": [
+            "error",
+            2
+        ]
     }
 }

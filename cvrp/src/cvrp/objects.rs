@@ -23,8 +23,9 @@ impl Client {
         Client { i, x, y, q }
     }
 
-    pub fn to_point(&self) -> JsValue {
-        JsValue::from_serde(&json!({"x" : self.i, "y" : self.y})).expect("JSON failed")
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(&json!({"i" : self.i, "x" : self.x, "y" : self.y, "q" : self.q}))
+            .expect("Client to JSON failed")
     }
 
     pub fn to_string(self) -> String {

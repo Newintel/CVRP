@@ -1,19 +1,17 @@
 import { CVRP } from 'cvrp';
-import { Graph, Point } from 'types';
+import { Color, Graph, IClient } from 'types';
 
 interface IProps {
   cvrp : CVRP,
-  graph : Graph
+  graph : Graph,
 }
 
 const displayCvrp = ({ cvrp, graph } : IProps) : EventListener => () => {
   graph.clear();
 
-  const points : Point[] = cvrp.clients_to_points();
+  const points : IClient[] = cvrp.get_clients();
 
-  console.log(points);
-
-  points.forEach(p => graph.addPoint(p));
+  points.forEach(p => graph.addPoint(p, Color[p.i === 0 ? "RED" : "BLACK"]));
 };
 
 export default displayCvrp;
