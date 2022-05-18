@@ -1,20 +1,40 @@
-import { filePicker, graphFactory } from 'components';
+import {
+  buttonsFactory, filePicker, graphFactory,
+} from 'components';
 import { CVRP, wasm_init } from 'cvrp';
-import { displayCvrp, readData } from '__cvrp__';
+import {
+  displayCvrp, displayRandomPath, readData,
+} from '__cvrp__';
 
 // Display wasm errors in console.error
 wasm_init();
 
 const root = document.querySelector('#root');
 
+const C = 100;
+
 // Create cvrp global
-const cvrp = CVRP.new();
+const cvrp = CVRP.new(C);
 
 // Create graph
-const graph = graphFactory({ attributes: {
-  class: 'border m-5', width: 500, height: 500,
-} });
+const graph = graphFactory({
+  attributes: {
+    class: 'border m-5', width: 500, height: 500,
+  },
+});
+
+// nav
+const buttons = buttonsFactory({
+  onRandomClick: displayRandomPath({ cvrp, graph }),
+});
+
+const canvasAndButtons = document.createElement('div');
+canvasAndButtons.className = 'd-flex justify-content-around';
 
 // Add graph and filePicker components
-root!.appendChild(graph.canvas);
-root!.appendChild(filePicker({ onChange: readData(cvrp), onValidate: displayCvrp({ cvrp, graph }) }));
+canvasAndButtons.appendChild(graph.canvas);
+canvasAndButtons.appendChild(buttons);
+root!.appendChild(canvasAndButtons);
+root!.appendChild(filePicker({
+  onChange: readData(cvrp), onValidate: displayCvrp({ cvrp, graph }),
+}));

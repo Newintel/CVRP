@@ -6,9 +6,13 @@ import { Attributes } from 'types';
  * @param {Element} element l'élément auquel on ajoute les attributs
  * @param {Attributes} attributes objet contenant les attributs
  */
-const addAttributes = (element : Element, attributes : Attributes) => {
+const addAttributes = (
+  element : Element, attributes : Attributes,
+) => {
   Object.entries(attributes).forEach(([attribute, value]) => {
-    element.setAttribute(attribute, value);
+    element.setAttribute(
+      attribute, value,
+    );
   });
 };
 

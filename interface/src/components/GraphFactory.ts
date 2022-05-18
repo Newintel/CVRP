@@ -23,14 +23,15 @@ const normalizePoint = (p : Point) : Point => ({ x: 5 * p.x, y: 5 * p.y });
  */
 const graphFactory = ({ attributes } : IGraphFactory) : Graph => {
   const canvas = document.createElement('canvas');
-
   if (attributes !== undefined) {
-    Utils.addAttributes(canvas, attributes);
+    Utils.addAttributes(
+      canvas, attributes,
+    );
   }
 
   const ctx = canvas.getContext('2d');
 
-  const addCircle : Graph['addCircle'] =
+  const addCircle : Graph[ 'addCircle' ] =
     (
       center : Point, radius : number, fill = false, color = Color.BLACK,
     ) => {
@@ -42,7 +43,7 @@ const graphFactory = ({ attributes } : IGraphFactory) : Graph => {
 
       ctx.beginPath();
       ctx.arc(
-        _center.x, _center.y, radius, 0, 2*Math.PI,
+        _center.x, _center.y, radius, 0, 2 * Math.PI,
       );
 
       if (fill) {
@@ -51,13 +52,17 @@ const graphFactory = ({ attributes } : IGraphFactory) : Graph => {
       }
     };
 
-  const addPoint : Graph['addPoint'] = (point, color = Color.BLACK) => 
+  const addPoint : Graph[ 'addPoint' ] = (
+    point, color = Color.BLACK,
+  ) =>
     addCircle(
-      point, 3, true, color
+      point, 3, true, color,
     );
 
 
-  const addPath : Graph['addPath'] = (points, color = Color.BLACK) => {
+  const addPath : Graph[ 'addPath' ] = (
+    points, color = Color.BLACK,
+  ) => {
     const len = points.length;
     let i = 0;
 
@@ -65,7 +70,9 @@ const graphFactory = ({ attributes } : IGraphFactory) : Graph => {
       return;
     }
 
-    while ( i < len) {
+    ctx.beginPath();
+
+    while (i < len) {
       ctx.moveTo(...pointToCoordinates(normalizePoint(points[i++])));
       ctx.lineTo(...pointToCoordinates(normalizePoint(points[i % len])));
     }

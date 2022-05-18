@@ -65,20 +65,28 @@
         "object-curly-newline": [
             "error",
             {
-                "minProperties" : 3,
+                "minProperties": 3,
                 "consistent": true
             }
         ],
         "function-paren-newline": [
             "error",
             {
-                "minItems": 3,
-                "consistent": true
+                "minItems": 2
             }
         ],
         "indent": [
             "error",
             2
+        ],
+        "valid-jsdoc": [
+            "off"
+        ],
+        "camelcase": [
+            "off"
+        ],
+        "no-const-assign": [
+            "error"
         ]
     }
 }

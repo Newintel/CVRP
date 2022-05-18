@@ -1,6 +1,6 @@
 interface IProps {
   onChange : EventListener,
-  onValidate : EventListener
+  onValidate : EventListener,
 }
 
 
@@ -23,12 +23,16 @@ const FilePicker = ({ onChange, onValidate } : IProps) => {
   const input = document.createElement('input');
   input.type = 'file';
   input.className = 'custom-file-input';
-  input.addEventListener('change', onChange);
+  input.addEventListener(
+    'change', onChange,
+  );
 
   const btn = document.createElement('div');
   btn.className = 'btn btn-outline-primary';
-  btn.textContent = 'Valider';
-  btn.addEventListener('click', onValidate);
+  btn.textContent = 'Afficher points';
+  btn.addEventListener(
+    'click', onValidate,
+  );
 
   div.appendChild(input);
   inputGroup.appendChild(div);
