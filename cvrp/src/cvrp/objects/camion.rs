@@ -4,10 +4,10 @@ use wasm_bindgen::JsValue;
 
 use super::client::Client;
 
+#[derive(Clone)]
 pub struct Camion {
-    trajet: Vec<i8>,
+    pub trajet: Vec<i8>,
     pub poids: i32,
-    pub distance_parcourue: i32,
     pub poids_max: i32,
 }
 
@@ -26,7 +26,6 @@ impl Camion {
         Camion {
             trajet: vec![],
             poids: 0,
-            distance_parcourue: 0,
             poids_max,
         }
     }

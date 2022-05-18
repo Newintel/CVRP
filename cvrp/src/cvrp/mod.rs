@@ -74,4 +74,17 @@ impl CVRP {
     pub fn get_client(&self, index: i8) -> JsValue {
         return self.try_get_client(index).to_json();
     }
+
+    pub fn get_distance_parcourue(&self) -> f64 {
+        let mut distance = 0_f64;
+        for camion in &self.camions {
+            let mut i = 0;
+            let len = camion.trajet.len();
+            while i < len - 1 {
+                distance += self.clients[i].distance(&self.clients[i + 1]);
+                i += 1;
+            }
+        }
+        distance
+    }
 }

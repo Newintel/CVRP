@@ -4,7 +4,7 @@ use serde::Deserialize;
 use serde_json::json;
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 #[wasm_bindgen]
 pub struct Client {
     pub i: i8,
@@ -21,6 +21,10 @@ impl Client {
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&json!({"i" : self.i, "x" : self.x, "y" : self.y, "q" : self.q}))
             .expect("Client to JSON failed")
+    }
+
+    pub fn distance(&self, client: &Self) -> f64 {
+        f64::sqrt(((self.x - client.x).pow(2) + (self.y - client.y).pow(2)) as f64)
     }
 }
 
