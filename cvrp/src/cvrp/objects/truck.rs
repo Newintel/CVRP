@@ -57,4 +57,28 @@ impl Truck {
         }
         route
     }
+
+    pub fn insert_client_in_route(&mut self, index: usize, client: i16) {
+        self.route.insert(index, client)
+    }
+
+    pub fn insert_clients_in_route(&mut self, index: usize, clients: Vec<i16>) {
+        let route = vec![
+            self.route[..index].to_vec(),
+            clients,
+            self.route[index..].to_vec(),
+        ]
+        .concat();
+        self.route = route;
+    }
+
+    pub fn remove_clients_in_route(&mut self, start: usize, end: usize) -> Vec<i16> {
+        let route = self.route[start..=end].to_vec();
+        self.route = vec![
+            self.route[..start].to_vec(),
+            self.route[(end + 1)..].to_vec(),
+        ]
+        .concat();
+        route
+    }
 }

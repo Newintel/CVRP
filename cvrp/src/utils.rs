@@ -36,3 +36,9 @@ where
     }
     rand
 }
+
+pub fn two_different_random(max: usize) -> (usize, usize) {
+    let i = rand(max, None);
+    let j = rand(max, Some(i));
+    (i, j)
+}
