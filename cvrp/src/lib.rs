@@ -1,4 +1,5 @@
 mod cvrp;
+mod tests;
 mod utils;
 
 use utils::set_panic_hook;

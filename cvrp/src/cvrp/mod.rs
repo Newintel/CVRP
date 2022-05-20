@@ -1,6 +1,5 @@
 mod algos;
-mod objects;
-mod test;
+pub mod objects;
 
 use csv::{self, ReaderBuilder};
 use js_sys::{self};
@@ -17,12 +16,25 @@ pub struct CVRP {
 }
 
 impl CVRP {
-    pub fn try_get_client(&self, index: i8) -> &Client {
+    pub fn try_get_client(&self, index: i16) -> &Client {
         return self
             .clients
             .iter()
             .find(|cli| cli.i == index)
             .expect("Index not found");
+    }
+    pub fn mock(
+        clients: Option<Vec<Client>>,
+        camions: Option<Vec<Camion>>,
+        max_camion_weight: Option<i32>,
+        total_weight: Option<i32>,
+    ) -> Self {
+        return Self {
+            clients: clients.unwrap_or(vec![]),
+            camions: camions.unwrap_or(vec![]),
+            max_camion_weight: max_camion_weight.unwrap_or(0),
+            total_weight: total_weight.unwrap_or(0),
+        };
     }
 }
 
@@ -71,7 +83,7 @@ impl CVRP {
             + ((self.total_weight % self.max_camion_weight != 0) as i8)
     }
 
-    pub fn get_client(&self, index: i8) -> JsValue {
+    pub fn get_client(&self, index: i16) -> JsValue {
         return self.try_get_client(index).to_json();
     }
 

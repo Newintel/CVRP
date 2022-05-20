@@ -6,7 +6,7 @@ use super::client::Client;
 
 #[derive(Clone)]
 pub struct Camion {
-    pub trajet: Vec<i8>,
+    pub trajet: Vec<i16>,
     pub poids: i32,
     pub poids_max: i32,
 }
@@ -22,11 +22,19 @@ impl fmt::Display for Camion {
 }
 
 impl Camion {
-    pub fn new(poids_max: i32) -> Camion {
+    pub fn new(poids_max: i32) -> Self {
         Camion {
             trajet: vec![],
             poids: 0,
             poids_max,
+        }
+    }
+
+    pub fn mock(trajet: Option<Vec<i16>>, poids: Option<i32>, poids_max: Option<i32>) -> Self {
+        Camion {
+            trajet: trajet.unwrap_or(vec![]),
+            poids: poids.unwrap_or(0),
+            poids_max: poids_max.unwrap_or(0),
         }
     }
 

@@ -7,14 +7,14 @@ use wasm_bindgen::prelude::*;
 #[derive(Debug, Deserialize, Clone)]
 #[wasm_bindgen]
 pub struct Client {
-    pub i: i8,
+    pub i: i16,
     pub x: i8,
     pub y: i8,
     pub q: i8,
 }
 
 impl Client {
-    pub fn new(i: i8, x: i8, y: i8, q: i8) -> Client {
+    pub fn new(i: i16, x: i8, y: i8, q: i8) -> Client {
         Client { i, x, y, q }
     }
 

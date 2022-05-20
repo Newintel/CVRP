@@ -1,3 +1,4 @@
+use rand::{distributions::Standard, prelude::Distribution};
 use wasm_bindgen::prelude::*;
 
 pub fn set_panic_hook() {
@@ -17,4 +18,21 @@ extern "C" {
     pub fn log(text: &str);
     #[wasm_bindgen(js_namespace = console, js_name = log)]
     pub fn log_i8(number: i8);
+}
+
+pub fn rand<T>(limit: T, forbidden: Option<T>) -> T
+where
+    Standard: Distribution<T>,
+    T: std::ops::Rem<Output = T> + std::cmp::PartialEq + Copy,
+{
+    if forbidden.is_none() {
+        return rand::random::<T>() % limit;
+    }
+
+    let forbidden = forbidden.unwrap();
+    let mut rand = forbidden;
+    while rand == forbidden {
+        rand = rand::random::<T>() % limit;
+    }
+    rand
 }
