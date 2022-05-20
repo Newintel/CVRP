@@ -22,7 +22,7 @@ const displayRandomPath = ({ cvrp, graph } : IProps) => () => {
   displayCvrp({ cvrp, graph })();
   cvrp.random_solution();
   let i = 0;
-  (cvrp.get_trajets() as number[][])
+  (cvrp.get_routes() as number[][])
     .forEach(path => {
       graph.addPath(
         path.map(index => cvrp.get_client(index) as Client),
