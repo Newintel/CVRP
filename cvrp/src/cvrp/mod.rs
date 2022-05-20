@@ -8,6 +8,7 @@ use wasm_bindgen::prelude::*;
 use self::objects::{camion::Camion, client::Client};
 
 #[wasm_bindgen]
+#[derive(Clone)]
 pub struct CVRP {
     clients: Vec<Client>,
     pub total_weight: i32,
@@ -35,6 +36,10 @@ impl CVRP {
             max_camion_weight: max_camion_weight.unwrap_or(0),
             total_weight: total_weight.unwrap_or(0),
         };
+    }
+
+    pub fn get_camions(&self) -> &Vec<Camion> {
+        &self.camions
     }
 }
 
