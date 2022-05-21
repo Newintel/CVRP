@@ -3,6 +3,7 @@ mod utils;
 
 use crate::cvrp::objects::truck::Truck;
 use crate::cvrp::CVRP;
+use crate::utils::log;
 
 // Transformation locale
 impl Truck {
@@ -73,6 +74,8 @@ impl CVRP {
     }
 
     pub fn generate_neighborhood(&self) -> Vec<Self> {
+        log("Start neighborhood");
+
         let mut neighbors: Vec<Self> = vec![];
 
         while neighbors.len() < self.n_neighbors {
@@ -81,6 +84,8 @@ impl CVRP {
                 neighbors.push(cvrp.unwrap());
             }
         }
+
+        log("Neighborhood done");
 
         neighbors
     }

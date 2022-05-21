@@ -3,7 +3,7 @@ import {
 } from 'components';
 import { CVRP, wasm_init } from 'cvrp';
 import {
-  displayCvrp, displayRandomPath, readData,
+  displayCvrp, displayRandomPath, displayTabuResult, readData,
 } from '__cvrp__';
 
 // Display wasm errors in console.error
@@ -14,7 +14,9 @@ const root = document.querySelector('#root');
 const C = 100;
 
 // Create cvrp global
-const cvrp = CVRP.new(C);
+const cvrp = CVRP.new(
+  C, 5, undefined, 10000,
+);
 
 // Create graph
 const graph = graphFactory({
@@ -26,7 +28,9 @@ const graph = graphFactory({
 // nav
 const buttons = buttonsFactory({
   onRandomClick: displayRandomPath({ cvrp, graph }),
+  onTabuClick: displayTabuResult({ cvrp, graph }),
 });
+
 
 const canvasAndButtons = document.createElement('div');
 canvasAndButtons.className = 'd-flex justify-content-around';
@@ -34,6 +38,7 @@ canvasAndButtons.className = 'd-flex justify-content-around';
 // Add graph and filePicker components
 canvasAndButtons.appendChild(graph.canvas);
 canvasAndButtons.appendChild(buttons);
+
 root!.appendChild(canvasAndButtons);
 root!.appendChild(filePicker({
   onChange: readData(cvrp), onValidate: displayCvrp({ cvrp, graph }),

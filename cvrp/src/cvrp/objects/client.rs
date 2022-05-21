@@ -8,13 +8,13 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 pub struct Client {
     pub i: u8,
-    pub x: u8,
-    pub y: u8,
+    pub x: u16,
+    pub y: u16,
     pub q: u8,
 }
 
 impl Client {
-    pub fn new(i: u8, x: u8, y: u8, q: u8) -> Self {
+    pub fn new(i: u8, x: u16, y: u16, q: u8) -> Self {
         Client { i, x, y, q }
     }
 
@@ -37,6 +37,19 @@ impl Client {
 
     pub fn distance(&self, client: &Self) -> f64 {
         f64::sqrt(((self.x - client.x).pow(2) + (self.y - client.y).pow(2)) as f64)
+    }
+
+    pub fn with_factor(&self, factor: u8) -> Client {
+        Client::new(
+            self.i,
+            self.x * (factor as u16),
+            self.y * (factor as u16),
+            self.q,
+        )
+    }
+
+    pub fn is_source(&self) -> bool {
+        self.i == 0
     }
 }
 

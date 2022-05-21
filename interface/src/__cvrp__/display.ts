@@ -19,23 +19,25 @@ const displayCvrp = ({ cvrp, graph } : IProps) => () => {
 };
 
 const displayRandomPath = ({ cvrp, graph } : IProps) => () => {
+  if (graph.ctx === null) {
+    return;
+  }
   displayCvrp({ cvrp, graph })();
-  cvrp.random_solution();
-  let i = 0;
-  (cvrp.get_routes() as number[][])
-    .forEach(path => {
-      graph.addPath(
-        path.map(index => cvrp.get_client(index) as Client),
-        colors[i % colors.length],
-      );
-      console.log(colors[i % colors.length]);
-      i += 1;
-    });
+  cvrp.random_solution(
+    graph.ctx, graph.canvas, colors,
+  );
 };
 
-const displayTabuResult = ({ cvrp, graph } : IProps) => {
+const displayTabuResult = ({ cvrp, graph } : IProps) => () => {
+  if (graph.ctx === null) {
+    return;
+  }
   displayCvrp({ cvrp, graph });
-  const cvrp2 = cvrp.tabu_search(20);
+  cvrp.tabu_search(
+    20, graph.ctx, graph.canvas, colors,
+  );
 };
 
-export { displayCvrp, displayRandomPath };
+export {
+  displayCvrp, displayRandomPath, displayTabuResult,
+};

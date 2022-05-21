@@ -1,4 +1,5 @@
 mod algos;
+mod display;
 pub mod objects;
 
 use csv::{self, ReaderBuilder};
@@ -19,6 +20,7 @@ pub struct CVRP {
     trucks: Vec<Truck>,
     pub n_neighbors: usize,
     pub n_iterations: u16,
+    pub factor: u8,
 }
 
 impl CVRP {
@@ -42,6 +44,7 @@ impl CVRP {
             total_weight: total_weight.unwrap_or(0),
             n_neighbors: DEFAULT_N_NEIGHBORS,
             n_iterations: DEFAULT_N_ITERATIONS,
+            factor: 1,
         };
     }
 
@@ -54,6 +57,7 @@ impl CVRP {
 impl CVRP {
     pub fn new(
         max_truck_weight: u16,
+        factor: Option<u8>,
         n_neighbors: Option<usize>,
         n_iterations: Option<u16>,
     ) -> CVRP {
@@ -64,6 +68,7 @@ impl CVRP {
             trucks: vec![],
             n_neighbors: n_neighbors.unwrap_or(DEFAULT_N_NEIGHBORS),
             n_iterations: n_iterations.unwrap_or(DEFAULT_N_ITERATIONS),
+            factor: factor.unwrap_or(1),
         }
     }
 
