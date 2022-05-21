@@ -17,7 +17,7 @@ extern "C" {
     #[wasm_bindgen(js_namespace = console, js_name = log)]
     pub fn log(text: &str);
     #[wasm_bindgen(js_namespace = console, js_name = log)]
-    pub fn log_i8(number: i8);
+    pub fn log_u8(number: u8);
 }
 
 pub fn rand<T>(limit: T, forbidden: Option<T>) -> T

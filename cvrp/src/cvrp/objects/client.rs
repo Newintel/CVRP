@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, iter::FromIterator};
 
 use serde::Deserialize;
 use serde_json::json;
@@ -7,15 +7,27 @@ use wasm_bindgen::prelude::*;
 #[derive(Debug, Deserialize, Clone)]
 #[wasm_bindgen]
 pub struct Client {
-    pub i: i16,
-    pub x: i8,
-    pub y: i8,
-    pub q: i8,
+    pub i: u8,
+    pub x: u8,
+    pub y: u8,
+    pub q: u8,
 }
 
 impl Client {
-    pub fn new(i: i16, x: i8, y: i8, q: i8) -> Client {
+    pub fn new(i: u8, x: u8, y: u8, q: u8) -> Self {
         Client { i, x, y, q }
+    }
+
+    pub fn mock(i: u8, q: u8) -> Self {
+        Client { i, x: 0, y: 0, q }
+    }
+
+    pub fn mock_many(list: Vec<u8>) -> Vec<Self> {
+        Vec::from_iter(
+            list.iter()
+                .enumerate()
+                .map(|(i, p)| Self::mock(i as u8, *p)),
+        )
     }
 
     pub fn to_json(&self) -> JsValue {

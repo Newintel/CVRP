@@ -33,4 +33,9 @@ const displayRandomPath = ({ cvrp, graph } : IProps) => () => {
     });
 };
 
+const displayTabuResult = ({ cvrp, graph } : IProps) => {
+  displayCvrp({ cvrp, graph });
+  const cvrp2 = cvrp.tabu_search(20);
+};
+
 export { displayCvrp, displayRandomPath };
