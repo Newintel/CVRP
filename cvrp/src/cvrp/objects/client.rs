@@ -4,29 +4,24 @@ use serde::Deserialize;
 use serde_json::json;
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug, Deserialize, Clone)]
-#[wasm_bindgen]
-pub struct Client {
-    pub i: u8,
-    pub x: u16,
-    pub y: u16,
-    pub q: u8,
-}
+use crate::cvrp::{Distance, Weight};
+
+use super::{Client, Coord, Index};
 
 impl Client {
-    pub fn new(i: u8, x: u16, y: u16, q: u8) -> Self {
+    pub fn new(i: Index, x: Coord, y: Coord, q: Weight) -> Self {
         Client { i, x, y, q }
     }
 
-    pub fn mock(i: u8, q: u8) -> Self {
+    pub fn mock(i: Index, q: Weight) -> Self {
         Client { i, x: 0, y: 0, q }
     }
 
-    pub fn mock_many(list: Vec<u8>) -> Vec<Self> {
+    pub fn mock_many(list: Vec<Index>) -> Vec<Self> {
         Vec::from_iter(
             list.iter()
                 .enumerate()
-                .map(|(i, p)| Self::mock(i as u8, *p)),
+                .map(|(i, p)| Self::mock(i as Index, (*p).into())),
         )
     }
 
@@ -35,15 +30,15 @@ impl Client {
             .expect("Client to JSON failed")
     }
 
-    pub fn distance(&self, client: &Self) -> f64 {
-        f64::sqrt(((self.x - client.x).pow(2) + (self.y - client.y).pow(2)) as f64)
+    pub fn distance(&self, client: &Self) -> Distance {
+        Distance::sqrt(((self.x - client.x).pow(2) + (self.y - client.y).pow(2)).into())
     }
 
     pub fn with_factor(&self, factor: u8) -> Client {
         Client::new(
             self.i,
-            self.x * (factor as u16),
-            self.y * (factor as u16),
+            self.x * (factor as Coord),
+            self.y * (factor as Coord),
             self.q,
         )
     }
