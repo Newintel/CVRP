@@ -14,8 +14,8 @@ const root = document.querySelector('#root');
 const C = 100;
 
 // Create cvrp global
-const cvrp = CVRP.new(
-  C, 5, undefined, 10000,
+const cvrp = new CVRP(
+  C, 5,
 );
 
 // Create graph

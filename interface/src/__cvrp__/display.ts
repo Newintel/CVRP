@@ -22,7 +22,7 @@ const displayRandomPath = ({ cvrp, graph } : IProps) => () => {
   if (graph.ctx === null) {
     return;
   }
-  displayCvrp({ cvrp, graph })();
+  // displayCvrp({ cvrp, graph })();
   cvrp.random_solution(
     graph.ctx, graph.canvas, colors,
   );
@@ -34,7 +34,7 @@ const displayTabuResult = ({ cvrp, graph } : IProps) => () => {
   }
   displayCvrp({ cvrp, graph });
   cvrp.tabu_search(
-    20, graph.ctx, graph.canvas, colors,
+    100, graph.ctx, graph.canvas, colors, 100, 20,
   );
 };
 

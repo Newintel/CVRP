@@ -2,7 +2,10 @@
 mod algos {
     use std::iter::FromIterator;
 
-    use crate::cvrp::{objects::truck::Truck, CVRP};
+    use crate::cvrp::{
+        objects::{client::Client, truck::Truck},
+        CVRP,
+    };
 
     #[test]
     fn test_exchange() {
@@ -31,14 +34,18 @@ mod algos {
     #[test]
     fn test_cross_exchange() {
         for _ in 0..10 {
-            let truck = Truck::mock(Some(vec![0, 1, 2, 3, 4, 5, 0]), None, None);
-            let truck2 = Truck::mock(Some(vec![0, 6, 7, 8, 9, 10, 0]), None, None);
+            let truck = Truck::mock(Some(vec![0, 1, 2, 3, 4, 5, 0]), None, Some(16));
+            let truck2 = Truck::mock(Some(vec![0, 6, 7, 8, 9, 0]), None, Some(16));
 
-            let mut cvrp = CVRP::mock(None, Some(vec![truck, truck2]), None, None);
+            let clients = Client::mock_many(vec![0, 2, 4, 6, 1, 3, 5, 5, 4, 3]);
 
-            cvrp.cross_exchange();
+            let cvrp = CVRP::mock(Some(clients), Some(vec![truck, truck2]), None, None);
+            let mut cvrp2 = cvrp.clone();
+            cvrp2.cross_exchange();
 
-            let trucks = cvrp
+            assert_ne!(cvrp, cvrp2);
+
+            let trucks = cvrp2
                 .get_trucks()
                 .into_iter()
                 .map(|t| t.route.to_vec())
@@ -48,7 +55,7 @@ mod algos {
             let mut trucks = Vec::from_iter(trucks);
             trucks.sort();
 
-            assert_eq!(trucks, Vec::from_iter((1..=10).into_iter()))
+            assert_eq!(trucks, Vec::from_iter((1..10).into_iter()))
         }
     }
 }

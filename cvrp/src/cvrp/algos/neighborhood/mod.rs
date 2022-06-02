@@ -1,6 +1,8 @@
 mod methods;
 mod utils;
 
+use std::iter::FromIterator;
+
 use crate::cvrp::objects::truck::Truck;
 use crate::cvrp::CVRP;
 use crate::utils::log;
@@ -43,16 +45,40 @@ impl CVRP {
         return true;
     }
 
-    pub fn exchange_inter(&mut self) {
+    pub fn exchange_inter(&mut self) -> bool {
         let (i1, i2) = self.get_two_random_trucks();
         let mut c1 = self.trucks.get(i1).unwrap().to_owned();
         let mut c2 = self.trucks.get(i2).unwrap().to_owned();
-        let (j1, client1) = c1.get_random_client();
-        let (j2, client2) = c2.get_random_client();
-        c1.insert_client_in_route(j1, client2, self);
-        c2.insert_client_in_route(j2, client1, self);
+
+        let (j1, client1) = c1.get_random_client(None);
+
+        let client1_weight = self.get_cvrp_client(client1).q;
+        let good_clients = Vec::from_iter(
+            self.clients
+                .iter()
+                .filter(|c| c.q <= client1_weight && c.i != 0)
+                .map(|c| c.i),
+        );
+
+        if good_clients.is_empty() {
+            return false;
+        }
+
+        let (j2, client2) = c2.get_random_client(Some(good_clients));
+
+        log(format!("exchange {client1} with {client2}").as_str());
+
+        let test = c1.insert_client_in_route(j1, client2, self);
+        if test == false {
+            return false;
+        }
+        let test = c2.insert_client_in_route(j2, client1, self);
+        if test == false {
+            return false;
+        }
         self.trucks[i1] = c1;
         self.trucks[i2] = c2;
+        true
     }
 
     pub fn exchange(&mut self) {
@@ -73,19 +99,21 @@ impl CVRP {
         self.trucks[i] = truck;
     }
 
-    pub fn generate_neighborhood(&self) -> Vec<Self> {
-        log("Start neighborhood");
-
+    pub fn generate_neighborhood(&self, size: usize) -> Vec<Self> {
         let mut neighbors: Vec<Self> = vec![];
 
-        while neighbors.len() < self.n_neighbors {
-            let cvrp = self.create_random_neighbor();
-            if cvrp.is_some() {
-                neighbors.push(cvrp.unwrap());
-            }
+        while neighbors.len() < size / 3 {
+            neighbors.push(self.create_random_neighbor_intra());
         }
 
-        log("Neighborhood done");
+        while neighbors.len() < size {
+            let cvrp = self.create_random_neighbor_inter(false);
+            if cvrp.is_some() {
+                neighbors.push(cvrp.unwrap());
+            } else {
+                // log(format!("get neighbor failed: {}", neighbors.len()).as_str())
+            }
+        }
 
         neighbors
     }

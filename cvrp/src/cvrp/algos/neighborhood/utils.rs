@@ -1,8 +1,10 @@
+use std::iter::FromIterator;
+
 use wasm_bindgen::throw_str;
 
 use crate::{
     cvrp::{objects::truck::Truck, CVRP},
-    utils::{rand, two_different_random},
+    utils::{log, rand, two_different_random},
 };
 
 impl Truck {
@@ -14,9 +16,23 @@ impl Truck {
         (start + 1, end + 1)
     }
 
-    pub fn get_random_client(&self) -> (usize, u8) {
-        let index = rand(self.route.len() - 2, None) + 1;
-        (index, *self.route.get(index).unwrap())
+    pub fn get_random_client(&self, amongst: Option<Vec<u8>>) -> (usize, u8) {
+        let route;
+        if amongst.is_some() {
+            route = Vec::from_iter(
+                self.route
+                    .iter()
+                    .filter(|c| amongst.as_ref().unwrap().contains(*c)),
+            );
+        } else {
+            route = Vec::from_iter(self.route.iter().filter(|c| **c != 0));
+        }
+        let index = rand(route.len(), None);
+        let client = **route.get(index).unwrap();
+        (
+            self.route.iter().position(|c| *c == client).unwrap(),
+            client,
+        )
     }
 
     pub fn remove_random_clients(&mut self, cvrp: &CVRP) -> (usize, Vec<u8>) {
@@ -34,21 +50,46 @@ impl CVRP {
         let r = rand(self.trucks.len(), None);
         (r, self.trucks.get(r).unwrap().to_owned())
     }
-
-    pub fn create_random_neighbor(&self) -> Option<CVRP> {
-        let r = rand::<u8>(5, None);
+    pub fn create_random_neighbor_intra(&self) -> CVRP {
+        let r = rand::<u8>(3, None);
         let mut cvrp = self.clone();
 
         match r {
             0 => cvrp.exchange(),
-            1 => cvrp.exchange_inter(),
-            2 => {
+            1 => cvrp.inversion(),
+            2 => cvrp.insertion_shift(),
+            _ => throw_str(&format!("Random not supposed to be {r}").to_string()),
+        }
+
+        log(format!(
+            "r : {r}, dist : {}, orig : {}",
+            cvrp.get_distance(),
+            self.get_distance()
+        )
+        .as_str());
+        cvrp
+    }
+
+    pub fn create_random_neighbor_inter(&self, with_cross_exchange: bool) -> Option<CVRP> {
+        let r = if with_cross_exchange {
+            rand::<u8>(2, None)
+        } else {
+            0
+        };
+
+        let mut cvrp = self.clone();
+
+        match r {
+            0 => {
+                if cvrp.exchange_inter() == false {
+                    return None;
+                }
+            }
+            1 => {
                 if cvrp.cross_exchange() == false {
                     return None;
                 }
             }
-            3 => cvrp.inversion(),
-            4 => cvrp.insertion_shift(),
             _ => throw_str(&format!("Random not supposed to be {r}").to_string()),
         }
 

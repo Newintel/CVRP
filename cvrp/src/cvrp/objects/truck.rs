@@ -6,7 +6,7 @@ use crate::cvrp::CVRP;
 
 use super::client::Client;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Truck {
     pub route: Vec<u8>,
     pub weight: u16,
@@ -60,14 +60,16 @@ impl Truck {
         route
     }
 
-    pub fn insert_client_in_route(&mut self, index: usize, client: u8, cvrp: &CVRP) {
+    pub fn insert_client_in_route(&mut self, index: usize, client: u8, cvrp: &CVRP) -> bool {
         let old = cvrp.get_cvrp_client(*self.route.get(index).unwrap());
         let new = cvrp.get_cvrp_client(client);
         let new_weight = self.weight - ((old.q - new.q) as u16);
         if new_weight <= self.max_weight {
             self.route[index] = client;
             self.weight = new_weight;
+            return true;
         }
+        false
     }
 
     pub fn insert_clients_in_route(&mut self, index: usize, clients: Vec<u8>, cvrp: &CVRP) -> bool {
