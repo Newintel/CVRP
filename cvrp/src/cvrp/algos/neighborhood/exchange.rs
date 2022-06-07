@@ -1,15 +1,13 @@
 use wasm_bindgen::UnwrapThrowExt;
 
-use crate::{
-    cvrp::{objects::Truck, CVRP},
-    utils::log,
-};
+use crate::cvrp::{objects::Truck, CVRP};
 
 use super::{Exchange, Neighborhood};
 
 impl Truck {
     fn exchange(&mut self, i: usize, j: usize) {
-        self.route.swap(i, j)
+        self.route.swap(i, j);
+        self.must_update = true;
     }
 }
 
@@ -35,23 +33,12 @@ impl<'a> Neighborhood for Exchange<'a> {
                 self.next_indexes();
             }
         }
-        // log(format!(
-        //     "truck : {} / {}, i : {}, j : {}",
-        //     self.truck,
-        //     self.cvrp.trucks.len(),
-        //     self.i,
-        //     self.j
-        // )
-        // .as_str());
     }
 
     fn create_new(&self) -> Option<CVRP> {
         let mut cvrp = self.cvrp.clone();
         let truck = cvrp.trucks.get_mut(self.truck).unwrap_throw();
         truck.exchange(self.i, self.j);
-        // log("------------");
-        // log(format!("{:?}", self.cvrp.trucks[self.truck].route).as_str());
-        // log(format!("{:?}", cvrp.trucks[self.truck].route).as_str());
         cvrp.update_distance();
         Some(cvrp)
     }

@@ -34,7 +34,7 @@ const displayTabuResult = ({ cvrp, graph } : IProps) => () => {
   }
   displayCvrp({ cvrp, graph });
   cvrp.tabu_search(
-    20, graph.ctx, graph.canvas, colors, 100,
+    30, graph.ctx, graph.canvas, colors, 2000,
   );
 };
 

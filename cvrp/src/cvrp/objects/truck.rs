@@ -1,6 +1,8 @@
 use std::fmt;
 
-use crate::cvrp::Weight;
+use wasm_bindgen::UnwrapThrowExt;
+
+use crate::cvrp::{Weight, CVRP};
 
 use super::{Client, Index, Truck};
 
@@ -20,6 +22,8 @@ impl Truck {
             route: vec![],
             weight: 0,
             max_weight: poids_max,
+            distance: 0.into(),
+            must_update: false,
         }
     }
 
@@ -32,6 +36,8 @@ impl Truck {
             route: route.unwrap_or(vec![]),
             weight: poids.unwrap_or(0),
             max_weight: poids_max.unwrap_or(0),
+            distance: 0.into(),
+            must_update: false,
         }
     }
 
@@ -39,17 +45,27 @@ impl Truck {
         if self.weight + c.q as Weight <= self.max_weight {
             self.route.push(c.i);
             self.weight += c.q as Weight;
+            self.must_update = true;
             return true;
         }
         false
     }
 
-    pub fn get_full_route(&self) -> Vec<Index> {
-        let mut route = vec![0];
-        for i in &self.route {
-            route.push(*i);
+    pub fn update_distance(&mut self, cvrp: &CVRP) {
+        self.distance = 0.into();
+        let len: Index = self.route.len();
+        for i in 0..len {
+            let c1 = cvrp.get_cvrp_client(*self.route.get(i).unwrap_throw());
+            let c2 = cvrp.get_cvrp_client(*self.route.get((i + 1) % len).unwrap_throw());
+
+            self.distance += c1.distance(c2);
         }
-        route.push(0);
-        route
+        self.must_update = false;
+    }
+}
+
+impl PartialEq for Truck {
+    fn eq(&self, other: &Self) -> bool {
+        self.route == other.route
     }
 }

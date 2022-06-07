@@ -1,6 +1,5 @@
-use std::{fmt, iter::FromIterator};
+use std::{convert::TryInto, fmt, iter::FromIterator};
 
-use serde::Deserialize;
 use serde_json::json;
 use wasm_bindgen::prelude::*;
 
@@ -21,7 +20,7 @@ impl Client {
         Vec::from_iter(
             list.iter()
                 .enumerate()
-                .map(|(i, p)| Self::mock(i as Index, (*p).into())),
+                .map(|(i, p)| Self::mock(i, (*p).try_into().unwrap())),
         )
     }
 

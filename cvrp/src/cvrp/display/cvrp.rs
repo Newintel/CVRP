@@ -56,21 +56,11 @@ impl CVRP {
             ctx.begin_path();
             let len: i16 = truck.route.len() as i16;
 
-            for i in -1..len {
-                let client;
-                let client2;
-                if i == -1 {
-                    client = 0;
-                } else {
-                    client = *truck.route.get(i as usize).unwrap_throw();
-                }
+            for i in 0..len {
+                let client = *truck.route.get(i as usize).unwrap_throw();
                 let (x, y) = self.coordinates(client);
                 ctx.move_to(x.into(), y.into());
-                if i + 1 == len {
-                    client2 = 0;
-                } else {
-                    client2 = *truck.route.get((i + 1) as usize).unwrap_throw();
-                }
+                let client2 = *truck.route.get(((i + 1) % len) as usize).unwrap_throw();
                 let (x, y) = self.coordinates(client2);
                 ctx.line_to(x.into(), y.into());
             }

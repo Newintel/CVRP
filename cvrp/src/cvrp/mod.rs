@@ -8,7 +8,7 @@ use std::{
 };
 
 use csv::{self, ReaderBuilder};
-use js_sys::{self};
+use js_sys;
 use wasm_bindgen::prelude::*;
 
 use crate::utils::log;
@@ -22,7 +22,6 @@ pub type Distance = f64;
 #[derive(Clone, Debug)]
 pub struct CVRP {
     clients: Vec<Client>,
-    pub total_weight: Weight,
     max_truck_weight: Weight,
     trucks: Vec<Truck>,
     pub factor: u8,
@@ -43,13 +42,11 @@ impl CVRP {
         clients: Option<Vec<Client>>,
         trucks: Option<Vec<Truck>>,
         max_truck_weight: Option<Weight>,
-        total_weight: Option<Weight>,
     ) -> Self {
         return Self {
             clients: clients.unwrap_or(vec![]),
             trucks: trucks.unwrap_or(vec![]),
             max_truck_weight: max_truck_weight.unwrap_or(0),
-            total_weight: total_weight.unwrap_or(0),
             factor: 1,
             distance: 0.into(),
         };
@@ -66,7 +63,6 @@ impl CVRP {
     pub fn new(max_truck_weight: Weight, factor: Option<u8>) -> CVRP {
         CVRP {
             clients: Vec::new(),
-            total_weight: 0,
             max_truck_weight,
             trucks: vec![],
             factor: factor.unwrap_or(1),
@@ -82,7 +78,6 @@ impl CVRP {
 
         for entry in reader.deserialize::<Client>() {
             let record = entry.expect("Entry as Client failed");
-            self.total_weight += record.q as Weight;
             self.clients.push(record);
         }
     }
@@ -101,21 +96,25 @@ impl CVRP {
 }
 
 impl CVRP {
-    pub fn get_max_nb_truck(&self) -> u8 {
-        ((self.total_weight / self.max_truck_weight) as u8)
-            + ((self.total_weight % self.max_truck_weight != 0) as u8)
+    fn get_total_weight(&self) -> Weight {
+        self.clients.iter().map(|c| c.q).sum()
     }
 
-    pub fn update_distance(&mut self) -> Distance {
-        let mut distance: Distance = 0.into();
-        for truck in &self.trucks {
-            let len = truck.route.len();
-            for i in 0..(len - 1) {
-                distance += self.clients[i].distance(&self.clients[i + 1]);
+    pub fn get_max_nb_truck(&self) -> u8 {
+        let total_weight = self.get_total_weight();
+        ((total_weight / self.max_truck_weight) as u8)
+            + ((total_weight % self.max_truck_weight != 0) as u8)
+    }
+
+    pub fn update_distance(&mut self) {
+        self.distance = 0.into();
+        let a = self.clone();
+        for truck in &mut self.trucks {
+            if truck.must_update {
+                truck.update_distance(&a);
             }
+            self.distance += truck.distance;
         }
-        self.distance = distance;
-        distance
     }
 }
 
@@ -127,7 +126,7 @@ impl PartialEq for CVRP {
         }
 
         let mut i = 0;
-        while i < len && self.trucks.get(i).unwrap().route != other.trucks.get(i).unwrap().route {
+        while i < len && self.trucks.get(i).unwrap() == other.trucks.get(i).unwrap() {
             i += 1;
         }
 
@@ -159,7 +158,7 @@ impl PartialOrd for CVRP {
 
 impl fmt::Display for CVRP {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "CVRP: {}", self.distance)
+        write!(f, "CVRP: {} \n -- {:?}", self.distance, self.trucks)
     }
 }
 
