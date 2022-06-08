@@ -5,7 +5,7 @@ use std::cmp::min;
 use wasm_bindgen::prelude::*;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
-use super::neighborhood::Exchange;
+use super::neighborhood::{Exchange, FullNeighborhood, InterExchange};
 
 #[wasm_bindgen]
 impl CVRP {
@@ -29,7 +29,7 @@ impl CVRP {
 
         for index in n_clients {
             let mut i = 0;
-            let client = self.clients.get(index).unwrap_throw();
+            let client = self.clients.get(index).unwrap();
 
             while self.trucks[i].add_client(client) == false {
                 if i == self.trucks.len() - 1 {
@@ -54,6 +54,7 @@ impl CVRP {
         colors: &Array,
         n_iterations: Option<u16>,
     ) -> Self {
+        // self.clients = self.clients[0..20].to_vec();
         self.random_solution(&ctx, &canvas, &colors);
         let mut i = 0;
         let mut tabu: Vec<Self> = vec![self.clone()];
@@ -64,11 +65,18 @@ impl CVRP {
         let mut best_choice = self.clone();
 
         while i < n_iterations {
-            let mut neighborhood = Exchange::new(tabu.last().unwrap_throw());
+            let b = tabu.last().unwrap();
+            let mut exchange = Exchange::new(b);
+            let mut exchange_inter = InterExchange::new(b);
+
+            let mut neighborhood = FullNeighborhood::new(vec![&mut exchange, &mut exchange_inter]);
+            // let mut neighborhood = FullNeighborhood::new(vec![&mut exchange_inter]);
+            // let mut neighborhood = FullNeighborhood::new(vec![&mut exchange]);
+
             while neighborhood.has_next() {
                 let next = neighborhood.next();
                 if next.is_some() {
-                    let next = next.unwrap_throw();
+                    let next = next.unwrap();
                     if tabu.contains(&next) == false {
                         best_choice = min(best_choice, next);
                     }

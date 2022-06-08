@@ -1,5 +1,3 @@
-use wasm_bindgen::UnwrapThrowExt;
-
 use crate::cvrp::{objects::Truck, CVRP};
 
 use super::{Exchange, Neighborhood};
@@ -17,18 +15,21 @@ impl<'a> Neighborhood for Exchange<'a> {
     }
 
     fn next_indexes(&mut self) {
-        if (self.i == 0 && self.j == 0) == false {
+        let len = self.cvrp.trucks.get(self.truck).unwrap().route.len();
+
+        if (self.i == 1 && self.j == 1) == false {
             self.j += 1;
         }
+
         if self.j == self.i {
             self.i += 1;
-            self.j = 0;
+            self.j = 1;
         }
-        let truck = self.cvrp.trucks.get(self.truck).unwrap_throw();
-        if self.i == truck.route.len() {
+
+        if self.i == len {
             self.truck += 1;
-            self.i = 0;
-            self.j = 0;
+            self.i = 1;
+            self.j = 1;
             if self.has_next() {
                 self.next_indexes();
             }
@@ -37,21 +38,10 @@ impl<'a> Neighborhood for Exchange<'a> {
 
     fn create_new(&self) -> Option<CVRP> {
         let mut cvrp = self.cvrp.clone();
-        let truck = cvrp.trucks.get_mut(self.truck).unwrap_throw();
+        let truck = cvrp.trucks.get_mut(self.truck).unwrap();
         truck.exchange(self.i, self.j);
         cvrp.update_distance();
         Some(cvrp)
-    }
-
-    fn next(&mut self) -> Option<CVRP> {
-        let mut cvrp = None;
-
-        self.next_indexes();
-        if self.has_next() {
-            cvrp = self.create_new();
-        }
-
-        cvrp
     }
 }
 
@@ -60,8 +50,8 @@ impl<'a> Exchange<'a> {
         Exchange {
             cvrp,
             truck: 0,
-            i: 0,
-            j: 0,
+            i: 1,
+            j: 1,
         }
     }
 }

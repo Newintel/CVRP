@@ -1,6 +1,6 @@
 use std::f64::consts::PI;
 
-use wasm_bindgen::{prelude::wasm_bindgen, UnwrapThrowExt};
+use wasm_bindgen::prelude::wasm_bindgen;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
 use crate::cvrp::{display::utils::clear, objects::Index, Distance, CVRP};
@@ -57,10 +57,10 @@ impl CVRP {
             let len: i16 = truck.route.len() as i16;
 
             for i in 0..len {
-                let client = *truck.route.get(i as usize).unwrap_throw();
+                let client = *truck.route.get(i as usize).unwrap();
                 let (x, y) = self.coordinates(client);
                 ctx.move_to(x.into(), y.into());
-                let client2 = *truck.route.get(((i + 1) % len) as usize).unwrap_throw();
+                let client2 = *truck.route.get(((i + 1) % len) as usize).unwrap();
                 let (x, y) = self.coordinates(client2);
                 ctx.line_to(x.into(), y.into());
             }
