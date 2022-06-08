@@ -6,9 +6,12 @@ import {
 interface IProps {
   cvrp : CVRP,
   graph : Graph,
+  setInfo : (props : string, value : string) => void,
 }
 
-const displayCvrp = ({ cvrp, graph } : IProps) => () => {
+const displayCvrp = ({
+  cvrp, graph,
+} : Omit<IProps, 'setInfo'>) => () => {
   graph.clear();
 
   const points : Client[] = cvrp.get_clients();
@@ -18,22 +21,28 @@ const displayCvrp = ({ cvrp, graph } : IProps) => () => {
   ));
 };
 
-const displayRandomPath = ({ cvrp, graph } : IProps) => () => {
+const displayRandomPath = ({
+  cvrp, graph, setInfo,
+} : IProps) => () => {
   if (graph.ctx === null) {
     return;
   }
   cvrp.random_solution(
-    graph.ctx, graph.canvas, colors,
+    graph.ctx, graph.canvas, colors, setInfo,
   );
 };
 
-const displayTabuResult = ({ cvrp, graph } : IProps) => () => {
+const displayTabuResult = ({
+  cvrp, graph, setInfo,
+} : IProps) => () => {
   if (graph.ctx === null) {
     return;
   }
-  displayCvrp({ cvrp, graph });
+  displayCvrp({
+    cvrp, graph,
+  });
   cvrp.tabu_search(
-    30, graph.ctx, graph.canvas, colors, 200,
+    30, graph.ctx, graph.canvas, colors, 200, setInfo,
   );
 };
 

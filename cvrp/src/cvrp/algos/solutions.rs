@@ -14,6 +14,7 @@ impl CVRP {
         ctx: &CanvasRenderingContext2d,
         canvas: &HtmlCanvasElement,
         colors: &Array,
+        display_info: &js_sys::Function,
     ) {
         self.trucks.clear();
         for _ in 0..self.get_max_nb_truck() {
@@ -44,6 +45,14 @@ impl CVRP {
         self.update_distance();
 
         self.display_path(ctx, canvas, colors);
+
+        display_info
+            .call2(
+                &JsValue::UNDEFINED,
+                &JsValue::from("distance"),
+                &JsValue::from(self.distance),
+            )
+            .err();
     }
 
     pub fn tabu_search(
@@ -53,9 +62,10 @@ impl CVRP {
         canvas: &HtmlCanvasElement,
         colors: &Array,
         n_iterations: Option<u16>,
+        display_info: &js_sys::Function,
     ) -> Self {
         // self.clients = self.clients[0..20].to_vec();
-        self.random_solution(&ctx, &canvas, &colors);
+        self.random_solution(&ctx, &canvas, &colors, display_info);
         let mut i = 0;
         let mut tabu: Vec<Self> = vec![self.clone()];
 
@@ -69,9 +79,9 @@ impl CVRP {
             let mut exchange = Exchange::new(b);
             let mut exchange_inter = InterExchange::new(b);
 
-            let mut neighborhood = FullNeighborhood::new(vec![&mut exchange, &mut exchange_inter]);
+            // let mut neighborhood = FullNeighborhood::new(vec![&mut exchange, &mut exchange_inter]);
             // let mut neighborhood = FullNeighborhood::new(vec![&mut exchange_inter]);
-            // let mut neighborhood = FullNeighborhood::new(vec![&mut exchange]);
+            let mut neighborhood = FullNeighborhood::new(vec![&mut exchange]);
 
             while neighborhood.has_next() {
                 let next = neighborhood.next();
@@ -84,6 +94,15 @@ impl CVRP {
             }
 
             best = min(best, best_choice.clone());
+            best.display_path(ctx, canvas, colors);
+
+            display_info
+                .call2(
+                    &JsValue::UNDEFINED,
+                    &JsValue::from("distance"),
+                    &JsValue::from(self.distance),
+                )
+                .err();
 
             tabu.push(best_choice.clone());
 

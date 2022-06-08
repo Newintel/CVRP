@@ -1,18 +1,35 @@
-const Informations = () => {
-  const infosDiv = document.createElement('div');
-  infosDiv.className = 'm-auto w-auto';
+const Informations = (props : readonly string[]) => {
+  const globalDiv = document.createElement('div');
+  globalDiv.id = 'info';
 
-  const label = document.createElement('div');
-  label.textContent = 'Distance';
+  const components : {[key in typeof props[number]] : HTMLInputElement} = {};
 
-  const distance = document.createElement('div');
-  distance.className = 'border border-dark p-1';
-  distance.id = 'distance';
+  props.forEach(label => {
+    const infosDiv = document.createElement('div');
+    infosDiv.className = 'input-group';
 
-  infosDiv.appendChild(label);
-  infosDiv.appendChild(distance);
+    const labelDiv = document.createElement('span');
+    labelDiv.className = 'input-group-text';
+    labelDiv.textContent = label;
 
-  return infosDiv;
+    const infoDiv = document.createElement('input');
+    infoDiv.className = 'form-control';
+    infoDiv.id = label;
+    infoDiv.disabled = true;
+    infoDiv.readOnly = true;
+
+    infosDiv.appendChild(labelDiv);
+    infosDiv.appendChild(infoDiv);
+
+    globalDiv.appendChild(infosDiv);
+
+    components[label] = infoDiv;
+  });
+
+
+  return { global: globalDiv, set: (
+    prop : string, value : string,
+  ) => components[prop].textContent = value };
 };
 
 export default Informations;
