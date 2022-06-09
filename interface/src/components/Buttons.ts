@@ -20,9 +20,7 @@ const ButtonsFactory = (props : ButtonsFactoryProps) => {
     const random = document.createElement('div');
     random.className = `btn btn-${color}`;
     random.textContent = name;
-    random.addEventListener(
-      'click', onClick,
-    );
+    random.addEventListener('click', onClick);
     vert.appendChild(random);
   });
 

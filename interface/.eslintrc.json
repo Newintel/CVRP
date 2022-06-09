@@ -90,9 +90,7 @@
         ],
         "function-paren-newline": [
             "error",
-            {
-                "minItems": 2
-            }
+            "multiline-arguments"
         ],
         "indent": [
             "error",

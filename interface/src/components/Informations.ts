@@ -3,6 +3,7 @@ import { all_labels, NeighborhoodStruct } from 'cvrp';
 export enum InfosToSet {
   // Tabu
   TABU_ITERATIONS = 'Itérations',
+  TABU_SIZE = 'Taille liste taboue',
   // Simulated annealing
   SA_MU = 'µ',
   SA_ITERATIONS = 'Itérations par température',
@@ -11,7 +12,7 @@ export enum InfosToSet {
 }
 
 const labelsToSet = {
-  Tabu: [InfosToSet.TABU_ITERATIONS] as const,
+  Tabou: [InfosToSet.TABU_ITERATIONS, InfosToSet.TABU_SIZE] as const,
   Recuit: [
     InfosToSet.SA_INITIAL_T,
     InfosToSet.SA_ITERATIONS,
@@ -20,9 +21,11 @@ const labelsToSet = {
   ] as const,
 };
 
-type labelToSet = typeof labelsToSet[ keyof typeof labelsToSet ][ number ];
+type props = {
+  [key in InfosToSet] : number
+}
 
-const Informations = () => {
+const Informations = (props : props) => {
   const globalDiv = document.createElement('div');
   globalDiv.className = 'd-flex flex-column justify-content-around';
 
@@ -31,7 +34,7 @@ const Informations = () => {
   const components : { [ key : string ] : HTMLInputElement } = {};
 
   const accordion = document.createElement('div');
-  accordion.className = 'accordion';
+  accordion.className = 'accordion overflow-visible';
 
   Object.entries(labelsToSet).forEach(([
     key, value,
@@ -61,20 +64,18 @@ const Informations = () => {
     divBody.className = 'accordion-body';
     collapse.append(divBody);
 
-    button.addEventListener(
-      'click', () => {
-        if (button.classList.contains('collapsed')) {
-          button.classList.remove('collapsed');
-        } else {
-          button.classList.add('collapsed');
-        }
-        if (collapse.classList.contains('show')) {
-          collapse.classList.remove('show');
-        } else {
-          collapse.classList.add('show');
-        }
-      },
-    );
+    button.addEventListener('click', () => {
+      if (button.classList.contains('collapsed')) {
+        button.classList.remove('collapsed');
+      } else {
+        button.classList.add('collapsed');
+      }
+      if (collapse.classList.contains('show')) {
+        collapse.classList.remove('show');
+      } else {
+        collapse.classList.add('show');
+      }
+    });
 
     value.forEach(v => {
       const infosDiv = document.createElement('div');
@@ -88,6 +89,7 @@ const Informations = () => {
 
       const infoDiv = document.createElement('input');
       infoDiv.className = 'form-control';
+      infoDiv.placeholder = '' + props[v as InfosToSet];
       infosDiv.appendChild(infoDiv);
 
       components[v] = infoDiv;
@@ -142,29 +144,30 @@ const Informations = () => {
     input.className = 'form-check-input';
     input.id = key;
     input.checked = true;
-    input.setAttribute(
-      'role', 'switch',
-    );
+    input.setAttribute('role', 'switch');
     formDiv.appendChild(input);
     inputs[key as keyof typeof NeighborhoodStruct] = input;
+    input.addEventListener('change', () => {
+      if (Object.entries(inputs)
+        .filter(([, value]) => value?.checked).length === 0) {
+        input.checked = true;
+      }
+    });
 
     const label = document.createElement('label');
     label.className = 'form-check-label';
-    label.setAttribute(
-      'for', key,
-    );
+    label.setAttribute('for', key);
     label.textContent = key;
     formDiv.appendChild(label);
   });
 
   return {
     global: globalDiv,
-    setInfo: (
-      prop : string, value : string,
-    ) => {
+    setInfo: (prop : string, value : string) => {
       components[prop].value = value;
     },
-    getInfo: (prop : labelToSet) => components[prop].value,
+    getInfo: (prop : InfosToSet) =>
+      components[prop].value || ('' + props[prop]),
     getNeighborhoodStructs: () =>
       Object.entries(inputs)
         .filter(([, value]) => value?.checked)

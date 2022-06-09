@@ -13,7 +13,7 @@ pub trait Neighborhood {
     fn has_next(&self) -> bool;
     fn next_indexes(&mut self);
     fn create_new(&self) -> Option<CVRP>;
-    fn random_solution(&self) -> Option<CVRP>;
+    fn random_solution(&mut self) -> Option<CVRP>;
 
     fn next(&mut self) -> Option<CVRP> {
         let mut cvrp = None;

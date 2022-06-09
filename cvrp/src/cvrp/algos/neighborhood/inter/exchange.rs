@@ -64,7 +64,7 @@ impl<'a> Neighborhood for Exchange<'a> {
         None
     }
 
-    fn random_solution(&self) -> Option<CVRP> {
+    fn random_solution(&mut self) -> Option<CVRP> {
         let mut cvrp = self.cvrp.clone();
         let (mut i, mut j) = two_different_random(cvrp.trucks.len() - 1);
 

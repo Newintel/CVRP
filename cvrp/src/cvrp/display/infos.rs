@@ -12,7 +12,6 @@ pub enum Labels {
     NbCamion,
     CamMoyDist,
     MeanTruckWeight,
-    TotalIterations,
 }
 
 impl Labels {
@@ -22,7 +21,6 @@ impl Labels {
             Labels::NbCamion => "Nombre de camions",
             Labels::CamMoyDist => "Distance moyenne des camions",
             Labels::MeanTruckWeight => "Poids moyen des camions",
-            Labels::TotalIterations => "Nombre total d'itérations",
         }
     }
 }
@@ -52,10 +50,6 @@ impl CVRP {
                 .sum::<Distance>()
                 / nb_camion as Distance)
                 .to_string(),
-        );
-        map.insert(
-            Labels::TotalIterations.as_str().to_string(),
-            (self.iterations).to_string(),
         );
 
         map

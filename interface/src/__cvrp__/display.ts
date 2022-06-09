@@ -1,3 +1,4 @@
+import { InfosToSet } from 'components/Informations';
 import { CVRP } from 'cvrp';
 import {
   Graph,
@@ -12,16 +13,8 @@ interface WithDisplay {
   setInfo : (prop : string, value : string) => void,
 }
 
-interface Tabu {
-  getIterations : () => number,
-  getNeighborhoodStructs : () => string[],
-}
-
-interface SA {
-  getIterationsByTemp : () => number,
-  getMu : () => number,
-  getTempChanges : () => number,
-  getInitialTemp : () => number,
+interface Metaheuristique {
+  getInfo : (prop : InfosToSet) => string,
   getNeighborhoodStructs : () => string[],
 }
 
@@ -31,34 +24,40 @@ const displayRandomPath = ({
   if (graph.ctx === null) {
     return;
   }
-  cvrp.random_solution(
-    graph.ctx, graph.canvas, setInfo,
-  );
+  cvrp.random_solution(graph.ctx, graph.canvas, setInfo);
 };
 
 const displayTabuResult = ({
-  cvrp, graph, setInfo, getIterations,
+  cvrp, graph, setInfo, getInfo,
   getNeighborhoodStructs,
-} : IProps & WithDisplay & Tabu) => () => {
+} : IProps & WithDisplay & Metaheuristique) => () => {
   if (graph.ctx === null) {
     return;
   }
   cvrp.tabu_search(
-    30, graph.ctx, graph.canvas, getIterations(), setInfo,
+    parseInt(getInfo(InfosToSet.TABU_SIZE)),
+    graph.ctx,
+    graph.canvas,
+    parseInt(getInfo(InfosToSet.TABU_ITERATIONS)),
+    setInfo,
     getNeighborhoodStructs(),
   );
 };
 
 const displaySA = ({
-  cvrp, graph, setInfo, getIterationsByTemp,
-  getMu, getTempChanges, getInitialTemp, getNeighborhoodStructs,
-} : IProps & WithDisplay & SA) => () => {
+  cvrp, graph, setInfo, getInfo, getNeighborhoodStructs,
+} : IProps & WithDisplay & Metaheuristique) => () => {
   if (graph.ctx === null) {
     return;
   }
   cvrp.simulated_annealing(
-    getInitialTemp(), getTempChanges(), getMu(),
-    getIterationsByTemp(), graph.ctx, graph.canvas, setInfo,
+    parseFloat(getInfo(InfosToSet.SA_INITIAL_T)),
+    parseInt(getInfo(InfosToSet.SA_T_CHANGES)),
+    parseFloat(getInfo(InfosToSet.SA_MU)),
+    parseInt(getInfo(InfosToSet.SA_ITERATIONS)),
+    graph.ctx,
+    graph.canvas,
+    setInfo,
     getNeighborhoodStructs(),
   );
 };

@@ -46,7 +46,7 @@ impl<'a> Neighborhood for Relocate<'a> {
         Some(cvrp)
     }
 
-    fn random_solution(&self) -> Option<CVRP> {
+    fn random_solution(&mut self) -> Option<CVRP> {
         let mut cvrp = self.cvrp.clone();
         let truck = cvrp
             .trucks

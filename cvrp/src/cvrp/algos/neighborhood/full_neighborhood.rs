@@ -35,21 +35,16 @@ impl<'a> Neighborhood for FullNeighborhood<'a> {
         return None;
     }
 
-    fn random_solution(self: &FullNeighborhood<'a>) -> Option<CVRP> {
-        let index = rand(self.components.len(), None);
-        let neighborhood = self.components.get(index);
+    fn random_solution(&mut self) -> Option<CVRP> {
         let mut cvrp = None;
-        let mut i = 0;
+        let index = rand(self.components.len(), None);
+        let neighborhood = self.components.get_mut(index).unwrap();
 
         while cvrp.is_none() {
-            i += 1;
-            cvrp = neighborhood.unwrap().random_solution();
+            cvrp = neighborhood.random_solution();
         }
 
-        let mut cvrp = cvrp.unwrap();
-        cvrp.iterations += i;
-
-        Some(cvrp)
+        cvrp
     }
 }
 

@@ -14,9 +14,7 @@ interface IGraphFactory {
 const graphFactory = ({ attributes } : IGraphFactory) : Graph => {
   const canvas = document.createElement('canvas');
   if (attributes !== undefined) {
-    Utils.addAttributes(
-      canvas, attributes,
-    );
+    Utils.addAttributes(canvas, attributes);
   }
 
   const ctx = canvas.getContext('2d');

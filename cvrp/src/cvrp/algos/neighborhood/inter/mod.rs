@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::cvrp::CVRP;
 
 pub mod exchange;

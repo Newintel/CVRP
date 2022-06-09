@@ -20,15 +20,15 @@ const FACTOR = 5;
 const OFFSET = 10;
 const DEFAULT_ITERATIONS = 100;
 
+const DEFAULT_TABU_SIZE = 30;
+
 const DEFAULT_INITIAL_T = 3;
 const DEFAULT_ITERATIONS_PER_T = 20;
 const DEFAULT_MU = .1;
 const DEFAULT_TEMP_CHANGES = 5;
 
 // Create cvrp global
-const cvrp = new CVRP(
-  MAX_TRUCK_WEIGHT, FACTOR, OFFSET,
-);
+const cvrp = new CVRP(MAX_TRUCK_WEIGHT, FACTOR, OFFSET);
 
 // Create graph
 const graph = graphFactory({
@@ -41,7 +41,14 @@ const graph = graphFactory({
 
 const {
   global, setInfo, getInfo, getNeighborhoodStructs,
-} = informationsFactory();
+} = informationsFactory({
+  [InfosToSet.TABU_ITERATIONS]: DEFAULT_ITERATIONS,
+  [InfosToSet.TABU_SIZE]: DEFAULT_TABU_SIZE,
+  [InfosToSet.SA_MU]: DEFAULT_MU,
+  [InfosToSet.SA_T_CHANGES]: DEFAULT_TEMP_CHANGES,
+  [InfosToSet.SA_ITERATIONS]: DEFAULT_ITERATIONS_PER_T,
+  [InfosToSet.SA_INITIAL_T]: DEFAULT_INITIAL_T,
+});
 
 // nav
 const buttons = buttonsFactory({
@@ -59,8 +66,7 @@ const buttons = buttonsFactory({
       cvrp,
       graph,
       setInfo,
-      getIterations: () =>
-        parseInt(getInfo(InfosToSet.TABU_ITERATIONS)) || DEFAULT_ITERATIONS,
+      getInfo,
       getNeighborhoodStructs,
     }),
   },
@@ -70,15 +76,7 @@ const buttons = buttonsFactory({
       cvrp,
       graph,
       setInfo,
-      getInitialTemp: () =>
-        parseFloat(getInfo(InfosToSet.SA_INITIAL_T)) || DEFAULT_INITIAL_T,
-      getIterationsByTemp: () =>
-        parseFloat(getInfo(InfosToSet.SA_ITERATIONS)) ||
-        DEFAULT_ITERATIONS_PER_T,
-      getMu: () =>
-        parseFloat(getInfo(InfosToSet.SA_MU)) || DEFAULT_MU,
-      getTempChanges: () =>
-        parseFloat(getInfo(InfosToSet.SA_T_CHANGES)) || DEFAULT_TEMP_CHANGES,
+      getInfo,
       getNeighborhoodStructs,
     }),
   },
@@ -95,7 +93,5 @@ canvasAndButtons.appendChild(buttons);
 root!.appendChild(canvasAndButtons);
 root!.appendChild(filePicker({
   onChange: readData(cvrp),
-  onValidate: () => cvrp.display(
-    graph.ctx!, graph.canvas,
-  ),
+  onValidate: () => cvrp.display(graph.ctx!, graph.canvas),
 }));
