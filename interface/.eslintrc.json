@@ -62,11 +62,30 @@
                 }
             }
         ],
+        "@typescript-eslint/comma-dangle": [
+            "error",
+            {
+                "arrays": "only-multiline",
+                "objects": "only-multiline",
+                "imports": "only-multiline",
+                "exports": "only-multiline",
+                "functions": "only-multiline",
+                "enums": "always",
+                "generics": "only-multiline",
+                "tuples": "only-multiline"
+            }
+        ],
         "object-curly-newline": [
             "error",
             {
                 "minProperties": 3,
                 "consistent": true
+            }
+        ],
+        "object-property-newline": [
+            "error",
+            {
+                "allowAllPropertiesOnSameLine": false
             }
         ],
         "function-paren-newline": [

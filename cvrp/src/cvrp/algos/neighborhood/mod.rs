@@ -1,8 +1,11 @@
-pub mod exchange;
 pub mod full_neighborhood;
-pub mod inter_exchange;
+pub mod inter;
+pub mod intra;
 
 use std::usize;
+
+use strum::{EnumString, FromRepr};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::cvrp::CVRP;
 
@@ -10,6 +13,7 @@ pub trait Neighborhood {
     fn has_next(&self) -> bool;
     fn next_indexes(&mut self);
     fn create_new(&self) -> Option<CVRP>;
+    fn random_solution(&self) -> Option<CVRP>;
 
     fn next(&mut self) -> Option<CVRP> {
         let mut cvrp = None;
@@ -29,17 +33,11 @@ pub struct FullNeighborhood<'a> {
     index: usize,
 }
 
-pub struct Exchange<'a> {
-    cvrp: &'a CVRP,
-    truck: usize,
-    i: usize,
-    j: usize,
-}
-
-pub struct InterExchange<'a> {
-    cvrp: &'a CVRP,
-    truck1: usize,
-    truck2: usize,
-    i: usize,
-    j: usize,
+#[wasm_bindgen]
+#[derive(FromRepr, PartialEq, Eq, Hash, EnumString)]
+pub enum NeighborhoodStruct {
+    InterExchange,
+    IntraExchange,
+    InterRelocate,
+    IntraRelocate,
 }

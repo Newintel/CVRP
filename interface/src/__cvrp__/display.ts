@@ -1,51 +1,68 @@
-import { Client, CVRP } from 'cvrp';
+import { CVRP } from 'cvrp';
 import {
-  Color, colors, Graph,
+  Graph,
 } from 'types';
 
 interface IProps {
   cvrp : CVRP,
   graph : Graph,
-  setInfo : (props : string, value : string) => void,
 }
 
-const displayCvrp = ({
-  cvrp, graph,
-} : Omit<IProps, 'setInfo'>) => () => {
-  graph.clear();
+interface WithDisplay {
+  setInfo : (prop : string, value : string) => void,
+}
 
-  const points : Client[] = cvrp.get_clients();
+interface Tabu {
+  getIterations : () => number,
+  getNeighborhoodStructs : () => string[],
+}
 
-  points.forEach(p => graph.addPoint(
-    p, Color[p.i === 0 ? 'RED' : 'BLACK'],
-  ));
-};
+interface SA {
+  getIterationsByTemp : () => number,
+  getMu : () => number,
+  getTempChanges : () => number,
+  getInitialTemp : () => number,
+  getNeighborhoodStructs : () => string[],
+}
 
 const displayRandomPath = ({
   cvrp, graph, setInfo,
-} : IProps) => () => {
+} : IProps & WithDisplay) => () => {
   if (graph.ctx === null) {
     return;
   }
   cvrp.random_solution(
-    graph.ctx, graph.canvas, colors, setInfo,
+    graph.ctx, graph.canvas, setInfo,
   );
 };
 
 const displayTabuResult = ({
-  cvrp, graph, setInfo,
-} : IProps) => () => {
+  cvrp, graph, setInfo, getIterations,
+  getNeighborhoodStructs,
+} : IProps & WithDisplay & Tabu) => () => {
   if (graph.ctx === null) {
     return;
   }
-  displayCvrp({
-    cvrp, graph,
-  });
   cvrp.tabu_search(
-    30, graph.ctx, graph.canvas, colors, 200, setInfo,
+    30, graph.ctx, graph.canvas, getIterations(), setInfo,
+    getNeighborhoodStructs(),
+  );
+};
+
+const displaySA = ({
+  cvrp, graph, setInfo, getIterationsByTemp,
+  getMu, getTempChanges, getInitialTemp, getNeighborhoodStructs,
+} : IProps & WithDisplay & SA) => () => {
+  if (graph.ctx === null) {
+    return;
+  }
+  cvrp.simulated_annealing(
+    getInitialTemp(), getTempChanges(), getMu(),
+    getIterationsByTemp(), graph.ctx, graph.canvas, setInfo,
+    getNeighborhoodStructs(),
   );
 };
 
 export {
-  displayCvrp, displayRandomPath, displayTabuResult,
+  displayRandomPath, displayTabuResult, displaySA,
 };

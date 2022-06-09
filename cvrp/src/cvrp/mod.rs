@@ -15,6 +15,7 @@ use crate::utils::log;
 
 use self::objects::{Client, Index, Truck};
 
+pub type Display = u8;
 pub type Weight = u16;
 pub type Distance = f64;
 
@@ -24,11 +25,13 @@ pub struct CVRP {
     clients: Vec<Client>,
     max_truck_weight: Weight,
     trucks: Vec<Truck>,
-    pub factor: u8,
+    // Display
+    pub factor: Display,
+    pub offset: Display,
+    // Infos
     pub distance: Distance,
+    iterations: u128,
 }
-
-pub const DEFAULT_N_ITERATIONS: u16 = 1000;
 
 impl CVRP {
     pub fn get_cvrp_client(&self, index: Index) -> &Client {
@@ -49,6 +52,8 @@ impl CVRP {
             max_truck_weight: max_truck_weight.unwrap_or(0),
             factor: 1,
             distance: 0.into(),
+            offset: 0.into(),
+            iterations: 0,
         };
     }
 
@@ -60,13 +65,15 @@ impl CVRP {
 #[wasm_bindgen]
 impl CVRP {
     #[wasm_bindgen(constructor)]
-    pub fn new(max_truck_weight: Weight, factor: Option<u8>) -> CVRP {
+    pub fn new(max_truck_weight: Weight, factor: Option<Display>, offset: Option<Display>) -> CVRP {
         CVRP {
             clients: Vec::new(),
             max_truck_weight,
             trucks: vec![],
             factor: factor.unwrap_or(1),
+            offset: offset.unwrap_or(0),
             distance: 0.into(),
+            iterations: 0,
         }
     }
 
@@ -78,6 +85,12 @@ impl CVRP {
 
         for entry in reader.deserialize::<Client>() {
             let record = entry.expect("Entry as Client failed");
+            if record.q > self.max_truck_weight {
+                panic!(
+                    "Le poids du client {} est plus grand que le poids max par camion défini ({})",
+                    record.q, self.max_truck_weight
+                );
+            }
             self.clients.push(record);
         }
     }
@@ -164,6 +177,6 @@ impl fmt::Display for CVRP {
 
 impl CVRP {
     pub fn log(&self, pre: Option<&str>) {
-        log(format!("{} - {self}", pre.unwrap_or("")).as_str())
+        log(format!("{} - {self}", pre.unwrap_or("")))
     }
 }

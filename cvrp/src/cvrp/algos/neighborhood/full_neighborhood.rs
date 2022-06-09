@@ -1,4 +1,7 @@
-use crate::{cvrp::CVRP, utils::log};
+use crate::{
+    cvrp::CVRP,
+    utils::{log, rand},
+};
 
 use super::{FullNeighborhood, Neighborhood};
 
@@ -23,7 +26,6 @@ impl<'a> Neighborhood for FullNeighborhood<'a> {
 
         if self.has_next() {
             let neighborhood = self.components.get_mut(self.index);
-
             if neighborhood.is_some() {
                 let neighborhood = neighborhood.unwrap();
                 return neighborhood.next();
@@ -31,6 +33,23 @@ impl<'a> Neighborhood for FullNeighborhood<'a> {
         }
 
         return None;
+    }
+
+    fn random_solution(self: &FullNeighborhood<'a>) -> Option<CVRP> {
+        let index = rand(self.components.len(), None);
+        let neighborhood = self.components.get(index);
+        let mut cvrp = None;
+        let mut i = 0;
+
+        while cvrp.is_none() {
+            i += 1;
+            cvrp = neighborhood.unwrap().random_solution();
+        }
+
+        let mut cvrp = cvrp.unwrap();
+        cvrp.iterations += i;
+
+        Some(cvrp)
     }
 }
 

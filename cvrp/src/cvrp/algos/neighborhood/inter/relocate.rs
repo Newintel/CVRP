@@ -1,23 +1,21 @@
 use crate::{
-    cvrp::{objects::Truck, CVRP},
-    utils::log,
+    cvrp::{algos::neighborhood::Neighborhood, objects::Truck, CVRP},
+    utils::{log, rand, two_different_random},
 };
 
-use super::{InterExchange, Neighborhood};
+use super::Relocate;
 
 impl Truck {
-    fn exchange_inter(&mut self, i: usize, other: &mut Self, j: usize, cvrp: &CVRP) -> bool {
-        let c1 = self.remove_client_from_cvrp(i, cvrp);
-        let c2 = other.remove_client_from_cvrp(j, cvrp);
+    fn relocate_inter(&mut self, i: usize, other: &mut Self, j: usize, cvrp: &CVRP) -> bool {
+        let client = self.remove_client_from_cvrp(i, cvrp);
 
-        let c1 = cvrp.get_cvrp_client(c1);
-        let c2 = cvrp.get_cvrp_client(c2);
+        let client = cvrp.get_cvrp_client(client);
 
-        other.insert_client(c1, j) && self.insert_client(c2, i)
+        other.insert_client(client, j)
     }
 }
 
-impl<'a> Neighborhood for InterExchange<'a> {
+impl<'a> Neighborhood for Relocate<'a> {
     fn has_next(&self) -> bool {
         let len = self.cvrp.trucks.len();
         len > 1
@@ -56,8 +54,30 @@ impl<'a> Neighborhood for InterExchange<'a> {
         let truck1 = trucks.1.get_mut(0).unwrap();
         let truck2 = trucks.0.get_mut(self.truck2).unwrap();
 
-        if truck1.exchange_inter(self.i, truck2, self.j, self.cvrp) {
+        if truck1.relocate_inter(self.i, truck2, self.j, self.cvrp) {
             cvrp.update_distance();
+            return Some(cvrp);
+        }
+
+        None
+    }
+
+    fn random_solution(&self) -> Option<CVRP> {
+        let mut cvrp = self.cvrp.clone();
+        let (mut i, mut j) = two_different_random(cvrp.trucks.len() - 1);
+
+        if i > j {
+            (i, j) = (j, i);
+        }
+
+        let trucks = cvrp.trucks.as_mut_slice().split_at_mut(j);
+        let truck1 = trucks.1.get_mut(0).unwrap();
+        let truck2 = trucks.0.get_mut(i).unwrap();
+
+        let i = rand(truck1.route.len() - 1, None) + 1;
+        let j = rand(truck2.route.len() - 1, None) + 1;
+
+        if truck1.relocate_inter(i, truck2, j, self.cvrp) {
             return Some(cvrp);
         }
 
@@ -65,9 +85,9 @@ impl<'a> Neighborhood for InterExchange<'a> {
     }
 }
 
-impl<'a> InterExchange<'a> {
+impl<'a> Relocate<'a> {
     pub fn new(cvrp: &'a CVRP) -> Self {
-        InterExchange {
+        Relocate {
             cvrp,
             truck1: 0,
             truck2: 0,

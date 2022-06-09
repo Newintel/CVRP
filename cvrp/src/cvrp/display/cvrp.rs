@@ -1,6 +1,7 @@
 use std::f64::consts::PI;
 
-use wasm_bindgen::prelude::wasm_bindgen;
+use strum::{EnumCount, IntoEnumIterator};
+use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
 use crate::cvrp::{display::utils::clear, objects::Index, Distance, CVRP};
@@ -12,19 +13,24 @@ const POINT_SIZE: f64 = 3f64;
 #[wasm_bindgen]
 impl CVRP {
     fn coordinates(&self, client: Index) -> (Distance, Distance) {
-        let client = self.get_cvrp_client(client).with_factor(self.factor);
+        let client = self
+            .get_cvrp_client(client)
+            .to_display(self.factor, self.offset);
         (client.x.into(), client.y.into())
     }
 
-    pub fn display(
-        &self,
-        ctx: &CanvasRenderingContext2d,
-        canvas: &HtmlCanvasElement,
-        colors: &js_sys::Array,
-    ) {
+    pub fn display(&self, ctx: &CanvasRenderingContext2d, canvas: &HtmlCanvasElement) {
         clear(ctx, canvas);
         for client in &self.clients {
-            let client = client.with_factor(self.factor);
+            let client = client.to_display(self.factor, self.offset);
+            let color;
+            if client.is_source() {
+                color = Color::RED;
+            } else {
+                color = Color::BLACK;
+            }
+            ctx.set_fill_style(&JsValue::from(color.as_str()));
+
             ctx.begin_path();
             let ok = ctx.arc(
                 client.x.into(),
@@ -34,24 +40,23 @@ impl CVRP {
                 2f64 * PI,
             );
             ok.expect("Arc draw failed");
-            let color;
-            if client.is_source() {
-                color = Color::RED;
-            } else {
-                color = Color::BLACK;
+
+            if client.i != 0 {
+                ctx.set_font("4px");
+                let ok = ctx.fill_text(
+                    client.i.to_string().as_str(),
+                    (client.x + 4).into(),
+                    client.y.into(),
+                );
+                ok.expect("Text draw failed");
             }
-            ctx.set_fill_style(&colors.get(color as u32));
+
             ctx.fill();
         }
     }
 
-    pub fn display_path(
-        &self,
-        ctx: &CanvasRenderingContext2d,
-        canvas: &HtmlCanvasElement,
-        colors: &js_sys::Array,
-    ) {
-        self.display(ctx, canvas, colors);
+    pub fn display_path(&self, ctx: &CanvasRenderingContext2d, canvas: &HtmlCanvasElement) {
+        self.display(ctx, canvas);
         for (index, truck) in self.trucks.iter().enumerate() {
             ctx.begin_path();
             let len: i16 = truck.route.len() as i16;
@@ -65,7 +70,10 @@ impl CVRP {
                 ctx.line_to(x.into(), y.into());
             }
 
-            ctx.set_stroke_style(&colors.get((index as u32) % colors.length()));
+            let colors: Vec<Color> = Color::iter().collect();
+            let color = colors.get(index % Color::COUNT).unwrap_or(&Color::BLACK);
+
+            ctx.set_stroke_style(&JsValue::from(color.as_str()));
             ctx.stroke();
         }
     }

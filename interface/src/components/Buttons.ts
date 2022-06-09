@@ -1,28 +1,30 @@
+import { BootstrapColor } from 'types';
+
 interface IProps {
-  onRandomClick : EventListener,
-  onTabuClick : EventListener,
+  color : BootstrapColor,
+  onClick : EventListener,
 }
 
-const ButtonsFactory = ({ onRandomClick, onTabuClick } : IProps) => {
-  const random = document.createElement('div');
-  random.className = 'btn btn-success';
-  random.textContent = 'Random';
-  random.addEventListener(
-    'click', onRandomClick,
-  );
+type ButtonsFactoryProps = {[key in 'Random' | 'Tabou' | 'Recuit'] : IProps}
 
-  const tabu = document.createElement('div');
-  tabu.className = 'btn btn-warning';
-  tabu.textContent = 'Tabu';
-  tabu.addEventListener(
-    'click', onTabuClick,
-  );
-
+const ButtonsFactory = (props : ButtonsFactoryProps) => {
   const vert = document.createElement('div');
   vert.className = 'btn-group-vertical';
 
-  vert.appendChild(random);
-  vert.appendChild(tabu);
+  Object.entries(props).forEach(([
+    name,
+    {
+      color, onClick,
+    },
+  ]) => {
+    const random = document.createElement('div');
+    random.className = `btn btn-${color}`;
+    random.textContent = name;
+    random.addEventListener(
+      'click', onClick,
+    );
+    vert.appendChild(random);
+  });
 
   return vert;
 };

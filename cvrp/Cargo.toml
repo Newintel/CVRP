@@ -17,6 +17,7 @@ js-sys = "0.3.57"
 rand = "0.8.5"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
+strum = { version = "0.24", features = ["derive"] }
 test-case = "2.0.2"
 vfs = "0.7.1"
 wasm-bindgen = {version = "0.2.80", features = ["serde-serialize"]}

@@ -1,6 +1,6 @@
 interface IProps {
   onChange : EventListener,
-  onValidate : EventListener,
+  onValidate : () => void,
 }
 
 

@@ -3,7 +3,7 @@ use std::{convert::TryInto, fmt, iter::FromIterator};
 use serde_json::json;
 use wasm_bindgen::prelude::*;
 
-use crate::cvrp::{Distance, Weight};
+use crate::cvrp::{Display, Distance, Weight};
 
 use super::{Client, Coord, Index};
 
@@ -33,11 +33,11 @@ impl Client {
         Distance::sqrt(((self.x - client.x).pow(2) + (self.y - client.y).pow(2)).into())
     }
 
-    pub fn with_factor(&self, factor: u8) -> Client {
+    pub fn to_display(&self, factor: Display, offset: Display) -> Client {
         Client::new(
             self.i,
-            self.x * (factor as Coord),
-            self.y * (factor as Coord),
+            self.x * (factor as Coord) + (offset / 2) as Coord,
+            self.y * (factor as Coord) + (offset / 2) as Coord,
             self.q,
         )
     }

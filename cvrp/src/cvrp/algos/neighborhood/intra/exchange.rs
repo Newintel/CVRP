@@ -1,6 +1,9 @@
-use crate::cvrp::{objects::Truck, CVRP};
+use crate::{
+    cvrp::{algos::neighborhood::Neighborhood, objects::Truck, CVRP},
+    utils::{log, rand, two_different_random},
+};
 
-use super::{Exchange, Neighborhood};
+use super::Exchange;
 
 impl Truck {
     fn exchange(&mut self, i: usize, j: usize) {
@@ -41,6 +44,26 @@ impl<'a> Neighborhood for Exchange<'a> {
         let truck = cvrp.trucks.get_mut(self.truck).unwrap();
         truck.exchange(self.i, self.j);
         cvrp.update_distance();
+        Some(cvrp)
+    }
+
+    fn random_solution(&self) -> Option<CVRP> {
+        let mut cvrp = self.cvrp.clone();
+        let truck = cvrp
+            .trucks
+            .get_mut(rand(self.cvrp.trucks.len() - 1, None) + 1)
+            .unwrap();
+        let len = truck.route.len();
+
+        if len == 2 {
+            return None;
+        }
+
+        let (i, j) = two_different_random(len - 1);
+        let (i, j) = (i + 1, j + 1);
+
+        truck.exchange(i, j);
+
         Some(cvrp)
     }
 }
