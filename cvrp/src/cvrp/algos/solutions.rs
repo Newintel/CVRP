@@ -48,7 +48,7 @@ impl CVRP {
 
         self.update_distance();
 
-        self.display_infos(display_info, time.elapsed());
+        self.display_infos(display_info, time.elapsed(), 0);
 
         self.display_path(ctx, canvas);
     }
@@ -81,6 +81,8 @@ impl CVRP {
                 )
             })
             .collect();
+
+        let mut nb_sol = 0;
 
         for _ in 0..n_iterations {
             let mut components: Vec<&mut dyn Neighborhood> = vec![];
@@ -116,6 +118,8 @@ impl CVRP {
                 }
             }
 
+            nb_sol += neighborhood.get_nb_sol();
+
             if local_best >= best_choice {
                 tabu.push(best_choice.clone());
             } else {
@@ -129,7 +133,7 @@ impl CVRP {
             }
         }
 
-        best.display_infos(display_info, time.elapsed());
+        best.display_infos(display_info, time.elapsed(), nb_sol);
 
         best.display_path(ctx, canvas);
 
@@ -166,6 +170,8 @@ impl CVRP {
             })
             .collect();
 
+        let mut nb_sol = 0;
+
         for _ in 0..t_changes {
             for _ in 0..iterations_per_t {
                 let mut components: Vec<&mut dyn Neighborhood> = vec![];
@@ -191,6 +197,7 @@ impl CVRP {
                 let mut neighborhood = FullNeighborhood::new(components);
 
                 let y = neighborhood.random_solution().unwrap();
+                nb_sol += neighborhood.get_nb_sol();
 
                 let delta = y.distance - local_best.distance;
                 if delta <= 0.into() {
@@ -206,7 +213,7 @@ impl CVRP {
             t = mu * t;
         }
 
-        best.display_infos(display_info, time.elapsed());
+        best.display_infos(display_info, time.elapsed(), nb_sol);
 
         best.display_path(ctx, canvas);
 

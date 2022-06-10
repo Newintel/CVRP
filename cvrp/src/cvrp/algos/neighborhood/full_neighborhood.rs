@@ -25,7 +25,11 @@ impl<'a> Neighborhood for FullNeighborhood<'a> {
             let neighborhood = self.components.get_mut(self.index);
             if neighborhood.is_some() {
                 let neighborhood = neighborhood.unwrap();
-                return neighborhood.next();
+                let next = neighborhood.next();
+                if next.is_some() {
+                    self.nb_sol += 1;
+                }
+                return next;
             }
         }
 
@@ -39,9 +43,14 @@ impl<'a> Neighborhood for FullNeighborhood<'a> {
 
         while cvrp.is_none() {
             cvrp = neighborhood.random_solution();
+            self.nb_sol += neighborhood.get_nb_sol();
         }
 
         cvrp
+    }
+
+    fn get_nb_sol(&self) -> u128 {
+        self.nb_sol
     }
 }
 
@@ -50,6 +59,7 @@ impl<'a> FullNeighborhood<'a> {
         FullNeighborhood {
             components,
             index: 0,
+            nb_sol: 0,
         }
     }
 }

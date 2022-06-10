@@ -14,6 +14,7 @@ pub enum Labels {
     CamMoyDist,
     MeanTruckWeight,
     Time,
+    NbSol,
 }
 
 impl Labels {
@@ -24,6 +25,7 @@ impl Labels {
             Labels::CamMoyDist => "Distance moyenne des camions",
             Labels::MeanTruckWeight => "Poids moyen des camions",
             Labels::Time => "Temps d'exécution",
+            Labels::NbSol => "Nombre de solutions générées",
         }
     }
 }
@@ -58,11 +60,12 @@ impl CVRP {
         map
     }
 
-    pub fn display_infos(&mut self, display_info: &js_sys::Function, t: Duration) {
+    pub fn display_infos(&mut self, display_info: &js_sys::Function, t: Duration, nb_sol: u128) {
         self.update_distance();
         let mut infos = self.get_infos();
 
         infos.insert(Labels::Time.as_str().to_string(), format!("{:?}", t));
+        infos.insert(Labels::NbSol.as_str().to_string(), format!("{nb_sol}"));
 
         for (label, value) in infos.iter() {
             display_info

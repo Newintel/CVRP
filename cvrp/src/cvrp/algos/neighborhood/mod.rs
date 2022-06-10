@@ -15,6 +15,10 @@ pub trait Neighborhood {
     fn create_new(&self) -> Option<CVRP>;
     fn random_solution(&mut self) -> Option<CVRP>;
 
+    fn get_nb_sol(&self) -> u128 {
+        1
+    }
+
     fn next(&mut self) -> Option<CVRP> {
         let mut cvrp = None;
 
@@ -31,6 +35,7 @@ pub trait Neighborhood {
 pub struct FullNeighborhood<'a> {
     components: Vec<&'a mut dyn Neighborhood>,
     index: usize,
+    nb_sol: u128,
 }
 
 #[wasm_bindgen]

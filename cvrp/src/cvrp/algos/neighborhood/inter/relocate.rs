@@ -74,16 +74,28 @@ impl<'a> Neighborhood for Relocate<'a> {
 
     fn random_solution(&mut self) -> Option<CVRP> {
         let mut all = vec![];
+        let max = ((self.cvrp.clients.len() - 1) as f64).powi(2) as u128;
+        let r = rand(max, None);
+        let mut i = 0;
         while self.has_next() {
             let next = self.next();
             if next.is_some() {
+                self.nb_sol += 1;
+                if i == r {
+                    return next;
+                }
                 all.push(next);
             }
+            i += 1;
         }
 
         let r = rand(all.len(), None);
 
         return all.remove(r);
+    }
+
+    fn get_nb_sol(&self) -> u128 {
+        self.nb_sol
     }
 }
 
@@ -95,6 +107,7 @@ impl<'a> Relocate<'a> {
             truck2: 0,
             i: 1,
             j: 1,
+            nb_sol: 0,
         }
     }
 }

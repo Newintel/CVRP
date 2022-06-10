@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::cvrp::CVRP;
 
 pub mod exchange;
@@ -19,4 +17,5 @@ pub struct Relocate<'a> {
     i: usize,
     truck2: usize,
     j: usize,
+    nb_sol: u128,
 }
