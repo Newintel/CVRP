@@ -1,5 +1,6 @@
 use std::{collections::HashMap, iter::FromIterator};
 
+use instant::Duration;
 use strum::{EnumCount, EnumIter, IntoEnumIterator};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
@@ -12,6 +13,7 @@ pub enum Labels {
     NbCamion,
     CamMoyDist,
     MeanTruckWeight,
+    Time,
 }
 
 impl Labels {
@@ -21,6 +23,7 @@ impl Labels {
             Labels::NbCamion => "Nombre de camions",
             Labels::CamMoyDist => "Distance moyenne des camions",
             Labels::MeanTruckWeight => "Poids moyen des camions",
+            Labels::Time => "Temps d'exécution",
         }
     }
 }
@@ -55,9 +58,11 @@ impl CVRP {
         map
     }
 
-    pub fn display_infos(&mut self, display_info: &js_sys::Function) {
+    pub fn display_infos(&mut self, display_info: &js_sys::Function, t: Duration) {
         self.update_distance();
-        let infos = self.get_infos();
+        let mut infos = self.get_infos();
+
+        infos.insert(Labels::Time.as_str().to_string(), format!("{:?}", t));
 
         for (label, value) in infos.iter() {
             display_info

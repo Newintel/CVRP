@@ -13,6 +13,7 @@ default = ["console_error_panic_hook"]
 [dependencies]
 csv = "1.1"
 getrandom = { version = "0.2", features = ["js"] }
+instant = { version = "0.1", features = [ "wasm-bindgen", "inaccurate" ] }
 js-sys = "0.3.57"
 rand = "0.8.5"
 serde = { version = "1", features = ["derive"] }

@@ -2,6 +2,7 @@ use crate::{
     cvrp::{algos::neighborhood::Neighborhood, Truck, CVRP},
     utils::log,
 };
+use instant::Instant;
 use rand::prelude::*;
 use std::{cmp::min, str::FromStr};
 use wasm_bindgen::prelude::*;
@@ -21,6 +22,7 @@ impl CVRP {
         canvas: &HtmlCanvasElement,
         display_info: &js_sys::Function,
     ) {
+        let time = Instant::now();
         self.trucks.clear();
         for _ in 0..self.get_max_nb_truck() {
             let mut truck = Truck::new(self.max_truck_weight);
@@ -49,9 +51,9 @@ impl CVRP {
 
         self.update_distance();
 
-        self.display_path(ctx, canvas);
+        self.display_infos(display_info, time.elapsed());
 
-        self.display_infos(display_info);
+        self.display_path(ctx, canvas);
     }
 
     pub fn tabu_search(
@@ -65,6 +67,8 @@ impl CVRP {
     ) -> Self {
         let mut best = self.clone();
         best.random_solution(&ctx, &canvas, display_info);
+
+        let time = Instant::now();
 
         let mut tabu: Vec<Self> = vec![best.clone()];
 
@@ -128,8 +132,9 @@ impl CVRP {
             }
         }
 
+        best.display_infos(display_info, time.elapsed());
+
         best.display_path(ctx, canvas);
-        best.display_infos(display_info);
 
         best
     }
@@ -148,7 +153,11 @@ impl CVRP {
         let mut best = self.clone();
         best.random_solution(ctx, canvas, display_info);
 
+        let time = Instant::now();
+
+        let mut local_best = best.clone();
         let mut t = initial_temperature;
+
         let neighborhood_structs: Vec<NeighborhoodStruct> = neighborhood_struct
             .iter()
             .filter_map(|j| {
@@ -188,21 +197,23 @@ impl CVRP {
 
                 let y = neighborhood.random_solution().unwrap();
 
-                let delta = y.distance - best.distance;
+                let delta = y.distance - local_best.distance;
                 if delta <= 0.into() {
-                    best = y;
+                    local_best = y;
+                    best = min(best, local_best.clone());
                 } else {
                     let r = rand::random::<f64>();
                     if r < f64::exp(-delta / t) {
-                        best = y;
+                        local_best = y;
                     }
                 }
             }
             t = mu * t;
         }
 
+        best.display_infos(display_info, time.elapsed());
+
         best.display_path(ctx, canvas);
-        best.display_infos(display_info);
 
         best.clone()
     }
