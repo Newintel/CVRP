@@ -1,6 +1,6 @@
 use crate::{
     cvrp::{algos::neighborhood::Neighborhood, objects::Truck, CVRP},
-    utils::{log, rand, two_different_random},
+    utils::{rand, two_different_random},
 };
 
 use super::Exchange;

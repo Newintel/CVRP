@@ -30,7 +30,6 @@ pub struct CVRP {
     pub offset: Display,
     // Infos
     pub distance: Distance,
-    iterations: u128,
 }
 
 impl CVRP {
@@ -53,7 +52,6 @@ impl CVRP {
             factor: 1,
             distance: 0.into(),
             offset: 0.into(),
-            iterations: 0,
         };
     }
 
@@ -73,7 +71,6 @@ impl CVRP {
             factor: factor.unwrap_or(1),
             offset: offset.unwrap_or(0),
             distance: 0.into(),
-            iterations: 0,
         }
     }
 

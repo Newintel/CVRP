@@ -1,7 +1,4 @@
-use crate::{
-    cvrp::{algos::neighborhood::Neighborhood, Truck, CVRP},
-    utils::log,
-};
+use crate::cvrp::{algos::neighborhood::Neighborhood, Truck, CVRP};
 use instant::Instant;
 use rand::prelude::*;
 use std::{cmp::min, str::FromStr};
@@ -169,10 +166,8 @@ impl CVRP {
             })
             .collect();
 
-        for i in 0..t_changes {
-            // log(format!("i : {i} / {t_changes}"));
-            for j in 0..iterations_per_t {
-                // log(format!("j : {j} / {iterations_per_t}"));
+        for _ in 0..t_changes {
+            for _ in 0..iterations_per_t {
                 let mut components: Vec<&mut dyn Neighborhood> = vec![];
 
                 let exchange = &mut Exchange::new(&best);

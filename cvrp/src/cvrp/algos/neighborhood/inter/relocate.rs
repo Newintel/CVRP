@@ -1,8 +1,6 @@
-use std::fmt::format;
-
 use crate::{
     cvrp::{algos::neighborhood::Neighborhood, objects::Truck, CVRP},
-    utils::{log, rand, two_different_random},
+    utils::rand,
 };
 
 use super::Relocate;
@@ -82,15 +80,6 @@ impl<'a> Neighborhood for Relocate<'a> {
                 all.push(next);
             }
         }
-
-        // log(format!(
-        //     "len : {}, {}, {}, {}, {}",
-        //     all.len(),
-        //     self.truck1,
-        //     self.truck2,
-        //     self.i,
-        //     self.j
-        // ));
 
         let r = rand(all.len(), None);
 

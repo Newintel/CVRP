@@ -1,7 +1,4 @@
-use crate::{
-    cvrp::CVRP,
-    utils::{log, rand},
-};
+use crate::{cvrp::CVRP, utils::rand};
 
 use super::{FullNeighborhood, Neighborhood};
 
