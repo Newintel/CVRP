@@ -90,6 +90,13 @@ const Informations = (props : props) => {
       const infoDiv = document.createElement('input');
       infoDiv.className = 'form-control';
       infoDiv.placeholder = '' + props[v as InfosToSet];
+      infoDiv.addEventListener('change', ev => {
+        const target = ev.target as HTMLInputElement;
+        if (isNaN(parseInt(target.value))) {
+          alert(`Le champ ${v} devrait être un nombre (int / float)`);
+          target.value = '';
+        }
+      });
       infosDiv.appendChild(infoDiv);
 
       components[v] = infoDiv;
