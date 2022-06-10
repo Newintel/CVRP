@@ -14,7 +14,7 @@ mod cvrp {
             None,
             Some(max_truck_weight),
         );
-        assert_eq!(3, cvrp.get_max_nb_truck())
+        assert_eq!(3, cvrp.get_min_nb_truck())
     }
 
     #[test]

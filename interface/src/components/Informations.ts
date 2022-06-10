@@ -11,14 +11,27 @@ export enum InfosToSet {
   SA_T_CHANGES = 'Changements de température',
 }
 
-const labelsToSet = {
-  Tabou: [InfosToSet.TABU_ITERATIONS, InfosToSet.TABU_SIZE] as const,
-  Recuit: [
+enum Infos {
+  TABU = 'Tabou',
+  SA = 'Recuit Simulé',
+  STATS = 'Statistiques',
+  NEIGHBORHOOD = 'Structures de voisinage',
+}
+
+type LTS = {
+  [key in Infos] : 'show' | '' | readonly InfosToSet[]
+}
+
+const labelsToSet : LTS = {
+  [Infos.TABU]: [InfosToSet.TABU_ITERATIONS, InfosToSet.TABU_SIZE] as const,
+  [Infos.SA]: [
     InfosToSet.SA_INITIAL_T,
     InfosToSet.SA_ITERATIONS,
     InfosToSet.SA_MU,
     InfosToSet.SA_T_CHANGES,
   ] as const,
+  [Infos.STATS]: 'show',
+  [Infos.NEIGHBORHOOD]: '',
 };
 
 type props = {
@@ -27,20 +40,21 @@ type props = {
 
 const Informations = (props : props) => {
   const globalDiv = document.createElement('div');
-  globalDiv.className = 'd-flex flex-column justify-content-around';
+  globalDiv.className = 'd-flex flex-column justify-content-between';
 
   const labels : string[] = all_labels();
 
   const components : { [ key : string ] : HTMLInputElement } = {};
 
-  const accordion = document.createElement('div');
-  accordion.className = 'accordion overflow-visible';
+  const inputs :
+    {
+      -readonly [ key in keyof typeof NeighborhoodStruct ] ?: HTMLInputElement
+    } = {};
 
-  Object.entries(labelsToSet).forEach(([
-    key, value,
-  ] :
-    [ string, readonly string[]
-]) => {
+  const accordion = document.createElement('div');
+  accordion.className = 'accordion';
+
+  Object.entries(labelsToSet).forEach(([key, value] ) => {
     const item = document.createElement('div');
     item.className = 'accordion-item';
     accordion.append(item);
@@ -52,13 +66,18 @@ const Informations = (props : props) => {
     const button = document.createElement('button');
     button.textContent = key;
     button.type = 'button';
-    button.className = 'accordion-button collapsed';
+    button.className = 'accordion-button';
     header.appendChild(button);
-
 
     const collapse = document.createElement('div');
     collapse.className = 'accordion-collapse collapse';
     item.appendChild(collapse);
+
+    if (value === 'show') {
+      collapse.classList.add('show');
+    } else {
+      button.classList.add('collapsed');
+    }
 
     const divBody = document.createElement('div');
     divBody.className = 'accordion-body';
@@ -77,96 +96,97 @@ const Informations = (props : props) => {
       }
     });
 
-    value.forEach(v => {
-      const infosDiv = document.createElement('div');
-      infosDiv.className = 'input-group';
-      divBody.appendChild(infosDiv);
+    if (Array.isArray(value)) {
+      value.forEach(v => {
+        const infosDiv = document.createElement('div');
+        infosDiv.className = 'input-group';
+        divBody.appendChild(infosDiv);
 
-      const labelDiv = document.createElement('span');
-      labelDiv.textContent = v;
-      labelDiv.className = 'input-group-text';
-      infosDiv.appendChild(labelDiv);
+        const labelDiv = document.createElement('span');
+        labelDiv.textContent = v;
+        labelDiv.className = 'input-group-text';
+        infosDiv.appendChild(labelDiv);
 
-      const infoDiv = document.createElement('input');
-      infoDiv.className = 'form-control';
-      infoDiv.placeholder = '' + props[v as InfosToSet];
-      infoDiv.addEventListener('change', ev => {
-        const target = ev.target as HTMLInputElement;
-        if (isNaN(parseInt(target.value))) {
-          alert(`Le champ ${v} devrait être un nombre (int / float)`);
-          target.value = '';
-        }
+        const infoDiv = document.createElement('input');
+        infoDiv.className = 'form-control';
+        infoDiv.placeholder = '' + props[v as InfosToSet];
+        infoDiv.addEventListener('change', ev => {
+          const target = ev.target as HTMLInputElement;
+          if (isNaN(parseInt(target.value))) {
+            alert(`Le champ ${v} devrait être un nombre (int / float)`);
+            target.value = '';
+          }
+        });
+        infosDiv.appendChild(infoDiv);
+
+        components[v] = infoDiv;
       });
-      infosDiv.appendChild(infoDiv);
+    } else {
+      const k : Infos = key as Infos;
+      if (k === Infos.STATS) {
+        const subDiv = document.createElement('div');
+        divBody.appendChild(subDiv);
 
-      components[v] = infoDiv;
-    });
+        labels.forEach(label => {
+          const infosDiv = document.createElement('div');
+          infosDiv.className = 'input-group mb-1';
+
+          const labelDiv = document.createElement('span');
+          labelDiv.className = 'input-group-text';
+          labelDiv.textContent = label;
+
+          const infoDiv = document.createElement('input');
+          infoDiv.className = 'form-control';
+          infoDiv.id = label;
+
+          infoDiv.disabled = true;
+          infoDiv.readOnly = true;
+
+          infosDiv.appendChild(labelDiv);
+          infosDiv.appendChild(infoDiv);
+
+          subDiv.appendChild(infosDiv);
+
+          components[label] = infoDiv;
+        });
+      } else if (k === Infos.NEIGHBORHOOD) {
+        const neighborDiv = document.createElement('div');
+        divBody.appendChild(neighborDiv);
+
+        Object.keys(NeighborhoodStruct).forEach(key => {
+          if (isNaN(parseInt(key)) === false) {
+            return;
+          }
+          const formDiv = document.createElement('div');
+          formDiv.className = 'form-check form-switch';
+          neighborDiv.appendChild(formDiv);
+
+          const input = document.createElement('input');
+          input.type = 'checkbox';
+          input.className = 'form-check-input';
+          input.id = key;
+          input.checked = true;
+          input.setAttribute('role', 'switch');
+          formDiv.appendChild(input);
+          inputs[key as keyof typeof NeighborhoodStruct] = input;
+          input.addEventListener('change', () => {
+            if (Object.entries(inputs)
+              .filter(([, value]) => value?.checked).length === 0) {
+              input.checked = true;
+            }
+          });
+
+          const label = document.createElement('label');
+          label.className = 'form-check-label';
+          label.setAttribute('for', key);
+          label.textContent = key;
+          formDiv.appendChild(label);
+        });
+      }
+    }
   });
 
   globalDiv.appendChild(accordion);
-
-  const subDiv = document.createElement('div');
-  globalDiv.appendChild(subDiv);
-
-  labels.forEach(label => {
-    const infosDiv = document.createElement('div');
-    infosDiv.className = 'input-group mb-1';
-
-    const labelDiv = document.createElement('span');
-    labelDiv.className = 'input-group-text';
-    labelDiv.textContent = label;
-
-    const infoDiv = document.createElement('input');
-    infoDiv.className = 'form-control';
-    infoDiv.id = label;
-
-    infoDiv.disabled = true;
-    infoDiv.readOnly = true;
-
-    infosDiv.appendChild(labelDiv);
-    infosDiv.appendChild(infoDiv);
-
-    subDiv.appendChild(infosDiv);
-
-    components[label] = infoDiv;
-  });
-
-  const neighborDiv = document.createElement('div');
-  globalDiv.appendChild(neighborDiv);
-  const inputs :
-    {
-      -readonly [ key in keyof typeof NeighborhoodStruct ] ?: HTMLInputElement
-    } = {};
-
-  Object.keys(NeighborhoodStruct).forEach(key => {
-    if (isNaN(parseInt(key)) === false) {
-      return;
-    }
-    const formDiv = document.createElement('div');
-    formDiv.className = 'form-check form-switch';
-    neighborDiv.appendChild(formDiv);
-
-    const input = document.createElement('input');
-    input.type = 'checkbox';
-    input.className = 'form-check-input';
-    input.id = key;
-    input.checked = true;
-    input.setAttribute('role', 'switch');
-    formDiv.appendChild(input);
-    inputs[key as keyof typeof NeighborhoodStruct] = input;
-    input.addEventListener('change', () => {
-      if (Object.entries(inputs)
-        .filter(([, value]) => value?.checked).length === 0) {
-        input.checked = true;
-      }
-    });
-
-    const label = document.createElement('label');
-    label.className = 'form-check-label';
-    label.setAttribute('for', key);
-    label.textContent = key;
-    formDiv.appendChild(label);
-  });
 
   return {
     global: globalDiv,

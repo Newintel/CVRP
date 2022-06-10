@@ -21,11 +21,6 @@ impl CVRP {
     ) {
         let time = Instant::now();
         self.trucks.clear();
-        for _ in 0..self.get_max_nb_truck() {
-            let mut truck = Truck::new(self.max_truck_weight);
-            truck.add_client(self.get_cvrp_client(0));
-            self.trucks.push(truck);
-        }
 
         let mut n_clients: Vec<usize> = (1..self.clients.len()).collect();
 
@@ -33,11 +28,12 @@ impl CVRP {
         n_clients.shuffle(&mut rng);
 
         for index in n_clients {
-            let mut i = 0;
+            let mut i: i32 = -1;
             let client = self.clients.get(index).unwrap();
 
-            while self.trucks.get_mut(i).unwrap().add_client(client) == false {
+            while i < 0 || self.trucks.get_mut(i as usize).unwrap().add_client(client) == false {
                 i += 1;
+                let i = i as usize;
                 if i == self.trucks.len() {
                     let mut truck = Truck::new(self.max_truck_weight);
                     truck.add_client(self.get_cvrp_client(0));

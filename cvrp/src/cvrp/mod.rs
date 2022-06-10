@@ -110,7 +110,7 @@ impl CVRP {
         self.clients.iter().map(|c| c.q).sum()
     }
 
-    pub fn get_max_nb_truck(&self) -> u8 {
+    pub fn get_min_nb_truck(&self) -> u8 {
         let total_weight = self.get_total_weight();
         ((total_weight / self.max_truck_weight) as u8)
             + ((total_weight % self.max_truck_weight != 0) as u8)
@@ -153,6 +153,9 @@ impl Ord for CVRP {
         }
 
         if self.distance == other.distance {
+            if self.trucks.len() > other.trucks.len() {
+                return Ordering::Greater;
+            }
             return Ordering::Equal;
         }
 

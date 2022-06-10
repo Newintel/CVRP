@@ -11,6 +11,7 @@ use crate::cvrp::{Distance, CVRP};
 pub enum Labels {
     Distance,
     NbCamion,
+    NbCamionMin,
     CamMoyDist,
     MeanTruckWeight,
     Time,
@@ -22,6 +23,7 @@ impl Labels {
         match self {
             Labels::Distance => "Distance",
             Labels::NbCamion => "Nombre de camions",
+            Labels::NbCamionMin => "Nombre minimum de camions",
             Labels::CamMoyDist => "Distance moyenne des camions",
             Labels::MeanTruckWeight => "Poids moyen des camions",
             Labels::Time => "Temps d'exécution",
@@ -41,6 +43,10 @@ impl CVRP {
             self.distance.to_string(),
         );
         map.insert(Labels::NbCamion.as_str().to_string(), nb_camion.to_string());
+        map.insert(
+            Labels::NbCamionMin.as_str().to_string(),
+            self.get_min_nb_truck().to_string(),
+        );
         map.insert(
             Labels::CamMoyDist.as_str().to_string(),
             (self.trucks.iter().map(|t| t.distance).sum::<Distance>() / nb_camion as Distance)
