@@ -24,6 +24,10 @@ const displayRandomPath = ({
   if (graph.ctx === null) {
     return;
   }
+  if (cvrp.is_empty()) {
+    alert('Erreur: Veuillez d\'abord sélectionner un fichier');
+    return;
+  }
   cvrp.random_solution(graph.ctx, graph.canvas, setInfo);
 };
 
@@ -32,6 +36,10 @@ const displayTabuResult = ({
   getNeighborhoodStructs,
 } : IProps & WithDisplay & Metaheuristique) => () => {
   if (graph.ctx === null) {
+    return;
+  }
+  if (cvrp.is_empty()) {
+    alert('Erreur: Veuillez d\'abord sélectionner un fichier');
     return;
   }
   cvrp.tabu_search(
@@ -48,6 +56,10 @@ const displaySA = ({
   cvrp, graph, setInfo, getInfo, getNeighborhoodStructs,
 } : IProps & WithDisplay & Metaheuristique) => () => {
   if (graph.ctx === null) {
+    return;
+  }
+  if (cvrp.is_empty()) {
+    alert('Erreur: Veuillez d\'abord sélectionner un fichier');
     return;
   }
   cvrp.simulated_annealing(

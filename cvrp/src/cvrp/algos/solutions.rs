@@ -1,6 +1,5 @@
-use crate::cvrp::{algos::neighborhood::Neighborhood, Truck, CVRP};
+use crate::cvrp::{algos::neighborhood::Neighborhood, CVRP};
 use instant::Instant;
-use rand::prelude::*;
 use std::{cmp::min, str::FromStr};
 use wasm_bindgen::prelude::*;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
@@ -20,29 +19,8 @@ impl CVRP {
         display_info: &js_sys::Function,
     ) {
         let time = Instant::now();
-        self.trucks.clear();
 
-        let mut n_clients: Vec<usize> = (1..self.clients.len()).collect();
-
-        let mut rng = rand::thread_rng();
-        n_clients.shuffle(&mut rng);
-
-        for index in n_clients {
-            let mut i: i32 = -1;
-            let client = self.clients.get(index).unwrap();
-
-            while i < 0 || self.trucks.get_mut(i as usize).unwrap().add_client(client) == false {
-                i += 1;
-                let i = i as usize;
-                if i == self.trucks.len() {
-                    let mut truck = Truck::new(self.max_truck_weight);
-                    truck.add_client(self.get_cvrp_client(0));
-                    self.trucks.push(truck);
-                }
-            }
-        }
-
-        self.update_distance();
+        self.fill_random();
 
         self.display_infos(display_info, time.elapsed(), 0);
 
@@ -58,10 +36,11 @@ impl CVRP {
         display_info: &js_sys::Function,
         neighborhood_struct: &js_sys::Array,
     ) -> Self {
-        let mut best = self.clone();
-        best.random_solution(&ctx, &canvas, display_info);
-
         let time = Instant::now();
+
+        let mut best = self.clone();
+
+        best.fill_random();
 
         let mut tabu: Vec<Self> = vec![best.clone()];
 
@@ -147,10 +126,10 @@ impl CVRP {
         display_info: &js_sys::Function,
         neighborhood_struct: &js_sys::Array,
     ) -> Self {
-        let mut best = self.clone();
-        best.random_solution(ctx, canvas, display_info);
-
         let time = Instant::now();
+
+        let mut best = self.clone();
+        best.fill_random();
 
         let mut local_best = best.clone();
         let mut t = initial_temperature;

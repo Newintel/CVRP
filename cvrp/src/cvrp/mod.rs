@@ -8,7 +8,7 @@ use std::{
 };
 
 use csv::{self, ReaderBuilder};
-use js_sys;
+use rand::prelude::SliceRandom;
 use wasm_bindgen::prelude::*;
 
 use crate::utils::log;
@@ -92,16 +92,8 @@ impl CVRP {
         }
     }
 
-    pub fn get_clients(&self) -> js_sys::Array {
-        let clients = js_sys::Array::new();
-        for client in &self.clients {
-            clients.push(&client.to_json());
-        }
-        clients
-    }
-
-    pub fn get_client(&self, index: Index) -> JsValue {
-        return self.get_cvrp_client(index).to_json();
+    pub fn is_empty(&self) -> bool {
+        self.clients.len() == 0
     }
 }
 
@@ -125,6 +117,32 @@ impl CVRP {
             }
             self.distance += truck.distance;
         }
+    }
+
+    pub fn fill_random(&mut self) {
+        self.trucks.clear();
+
+        let mut n_clients: Vec<usize> = (1..self.clients.len()).collect();
+
+        let mut rng = rand::thread_rng();
+        n_clients.shuffle(&mut rng);
+
+        for index in n_clients {
+            let mut i: i32 = -1;
+            let client = self.clients.get(index).unwrap();
+
+            while i < 0 || self.trucks.get_mut(i as usize).unwrap().add_client(client) == false {
+                i += 1;
+                let i = i as usize;
+                if i == self.trucks.len() {
+                    let mut truck = Truck::new(self.max_truck_weight);
+                    truck.add_client(self.get_cvrp_client(0));
+                    self.trucks.push(truck);
+                }
+            }
+        }
+
+        self.update_distance();
     }
 }
 
