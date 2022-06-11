@@ -108,7 +108,8 @@ impl CVRP {
             + ((total_weight % self.max_truck_weight != 0) as u8)
     }
 
-    pub fn update_distance(&mut self) {
+    fn update_distance(&mut self) {
+        self.clean();
         self.distance = 0.into();
         let a = self.clone();
         for truck in &mut self.trucks {
@@ -119,7 +120,7 @@ impl CVRP {
         }
     }
 
-    pub fn fill_random(&mut self) {
+    fn fill_random(&mut self) {
         self.trucks.clear();
 
         let mut n_clients: Vec<usize> = (1..self.clients.len()).collect();
@@ -143,6 +144,23 @@ impl CVRP {
         }
 
         self.update_distance();
+    }
+
+    fn clean(&mut self) {
+        let len = self.trucks.len();
+        let mut rem: Vec<usize> = vec![];
+
+        for i in 0..len {
+            if self.trucks.get(i).unwrap().route.len() < 2 {
+                rem.push(i);
+            }
+        }
+
+        rem.reverse();
+
+        for i in rem {
+            self.trucks.remove(i);
+        }
     }
 }
 
