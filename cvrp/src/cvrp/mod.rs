@@ -11,7 +11,7 @@ use csv::{self, ReaderBuilder};
 use rand::prelude::SliceRandom;
 use wasm_bindgen::prelude::*;
 
-use crate::utils::log;
+use crate::{alert, utils::log};
 
 use self::objects::{Client, Index, Truck};
 
@@ -83,10 +83,14 @@ impl CVRP {
         for entry in reader.deserialize::<Client>() {
             let record = entry.expect("Entry as Client failed");
             if record.q > self.max_truck_weight {
-                panic!(
-                    "Le poids du client {} est plus grand que le poids max par camion défini ({})",
-                    record.q, self.max_truck_weight
-                );
+                alert(
+                    format!("Erreur: Le poids du client {} est plus grand que la capacité donnée ({}), veuillez changer la capacité",
+                    record.i,
+                    self.max_truck_weight,
+                ).as_str());
+                let window = web_sys::window().expect_throw("window does not exist");
+                window.location().reload().expect("reload failed");
+                return;
             }
             self.clients.push(record);
         }
@@ -94,6 +98,22 @@ impl CVRP {
 
     pub fn is_empty(&self) -> bool {
         self.clients.len() == 0
+    }
+
+    pub fn set_capacity(&mut self, c: Weight) -> bool {
+        let cli = self.clients.iter().find(|client| client.q > c);
+        return if cli.is_some() {
+            let cli = cli.unwrap();
+            alert(
+                    format!("Erreur: Le poids du client {} est plus grand que la capacité donnée ({}), veuillez changer la capacité",
+                    cli.i,
+                    c,
+                ).as_str());
+            false
+        } else {
+            self.max_truck_weight = c;
+            true
+        };
     }
 }
 

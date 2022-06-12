@@ -1,4 +1,6 @@
-import { all_labels, NeighborhoodStruct } from 'cvrp';
+import {
+  all_labels, CVRP, NeighborhoodStruct,
+} from 'cvrp';
 
 export enum InfosToSet {
   // Tabu
@@ -38,9 +40,37 @@ type props = {
   [key in InfosToSet] : number
 }
 
-const Informations = (props : props) => {
+const Informations = (props : props, cvrp : CVRP, default_c : number) => {
   const globalDiv = document.createElement('div');
   globalDiv.className = 'd-flex flex-column justify-content-between';
+
+  const subDiv = document.createElement('div');
+  globalDiv.appendChild(subDiv);
+
+  const infosDiv = document.createElement('div');
+  infosDiv.className = 'input-group mb-2';
+  subDiv.appendChild(infosDiv);
+
+  const labelDiv = document.createElement('span');
+  labelDiv.textContent = 'Capacité des camions';
+  labelDiv.className = 'input-group-text';
+  infosDiv.appendChild(labelDiv);
+
+  const infoDiv = document.createElement('input');
+  infoDiv.type = 'number';
+  infoDiv.className = 'form-control';
+  infoDiv.min = '1';
+  infoDiv.valueAsNumber = default_c;
+  infoDiv.addEventListener('change', ev => {
+    const target = ev.target as HTMLInputElement;
+    if (target.value === '' || target.valueAsNumber === 0) {
+      alert(`La capacité doit être supérieure à 0`);
+      target.valueAsNumber = default_c;
+    } else if (cvrp.set_capacity(target.valueAsNumber) === false) {
+      target.valueAsNumber = default_c;
+    }
+  });
+  infosDiv.appendChild(infoDiv);
 
   const labels : string[] = all_labels();
 
@@ -53,6 +83,7 @@ const Informations = (props : props) => {
 
   const accordion = document.createElement('div');
   accordion.className = 'accordion';
+  subDiv.appendChild(accordion);
 
   Object.entries(labelsToSet).forEach(([key, value] ) => {
     const item = document.createElement('div');
@@ -112,7 +143,7 @@ const Informations = (props : props) => {
         infoDiv.placeholder = '' + props[v as InfosToSet];
         infoDiv.addEventListener('change', ev => {
           const target = ev.target as HTMLInputElement;
-          if (isNaN(parseInt(target.value))) {
+          if (target.value !== '' && isNaN(parseInt(target.value))) {
             alert(`Le champ ${v} devrait être un nombre (int / float)`);
             target.value = '';
           }
@@ -185,8 +216,6 @@ const Informations = (props : props) => {
       }
     }
   });
-
-  globalDiv.appendChild(accordion);
 
   return {
     global: globalDiv,

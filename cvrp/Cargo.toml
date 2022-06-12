@@ -43,7 +43,9 @@ wasm-bindgen-test = "0.3.13"
 version = "0.3"
 features = [
   "CanvasRenderingContext2d",
-  "HtmlCanvasElement"
+  "HtmlCanvasElement",
+  "Window",
+  "Location"
 ]
 
 [profile.release]

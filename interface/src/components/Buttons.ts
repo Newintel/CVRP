@@ -17,11 +17,11 @@ const ButtonsFactory = (props : ButtonsFactoryProps) => {
       color, onClick,
     },
   ]) => {
-    const random = document.createElement('div');
-    random.className = `btn btn-${color}`;
-    random.textContent = name;
-    random.addEventListener('click', onClick);
-    vert.appendChild(random);
+    const method = document.createElement('div');
+    method.className = `btn btn-${color}`;
+    method.textContent = name;
+    method.addEventListener('click', onClick);
+    vert.appendChild(method);
   });
 
   return vert;

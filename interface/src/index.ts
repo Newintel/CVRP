@@ -48,7 +48,7 @@ const {
   [InfosToSet.SA_T_CHANGES]: DEFAULT_TEMP_CHANGES,
   [InfosToSet.SA_ITERATIONS]: DEFAULT_ITERATIONS_PER_T,
   [InfosToSet.SA_INITIAL_T]: DEFAULT_INITIAL_T,
-});
+}, cvrp, MAX_TRUCK_WEIGHT);
 
 // nav
 const buttons = buttonsFactory({
