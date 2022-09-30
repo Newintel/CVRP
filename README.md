@@ -7,7 +7,7 @@
 Le code rust se situe dans le dossier cvrp/, et le code web dans le dossier interface/
 
 ## Execution simple
-Ouvrir le fichier interface/dist/index.html
+Lancer un server live et ouvrir le fichier interface/dist/index.html
 
 ## Prérequis debug
 1. <a href="https://www.rust-lang.org/tools/install">Installer  Rust</a> (OS Linux conseillé pour une plus grande facilité en terme de gestion de packages pour les installations)
